@@ -17,6 +17,7 @@ import me.wverdese.proseccheria.converter.asItemData
 import me.wverdese.proseccheria.domain.TableData
 import me.wverdese.proseccheria.model.BOTTLE
 import me.wverdese.proseccheria.model.Food
+import me.wverdese.proseccheria.model.GLASS
 import me.wverdese.proseccheria.model.ItemData
 import me.wverdese.proseccheria.model.Other
 import me.wverdese.proseccheria.model.Wine
@@ -158,11 +159,33 @@ class TableDataRepositoryTest {
         }
     }
 
-    /*@Test
+    @Test
     fun `test update item`() = runTest(context = testCoroutineDispatcher) {
+        val tableId = tables.first().id
+        val otherTableId = tables.last().id
+        val wineItem = TableData.Item.WineItem(wine, quantity = null, notes = null, vessel = null)
+        val wineItemUpdated = TableData.Item.WineItem(wine, quantity = 2, notes = "test", vessel = GLASS)
+
         repo.observeTableData.test {
-            val tableData = awaitItem()
-            assertEquals("T-01", tableData.table.id)
+            // initial check
+            var tableData = awaitItem()
+            assertEquals(tableId, tableData.table.id)
+            assertEquals(wineItem, tableData.items.find { it.item == wine })
+            // update check
+            repo.update(tableId, wineItemUpdated)
+            tableData = awaitItem()
+            assertEquals(tableId, tableData.table.id)
+            assertEquals(wineItemUpdated, tableData.items.find { it.item == wine })
+            // table change
+            repo.selectTable(otherTableId)
+            tableData = awaitItem()
+            assertEquals(otherTableId, tableData.table.id)
+            assertEquals(wineItem, tableData.items.find { it.item == wine })
+            // table reset
+            repo.selectTable(tableId)
+            tableData = awaitItem()
+            assertEquals(tableId, tableData.table.id)
+            assertEquals(wineItemUpdated, tableData.items.find { it.item == wine })
         }
-    }*/
+    }
 }

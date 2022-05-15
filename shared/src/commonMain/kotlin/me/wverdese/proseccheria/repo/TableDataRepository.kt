@@ -6,13 +6,9 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.fold
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.reduce
-import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.flow.update
 import me.wverdese.proseccheria.converter.asItem
 import me.wverdese.proseccheria.converter.asItemData
@@ -38,7 +34,16 @@ class TableDataRepository(
     val observeTableData: Flow<TableData> =
         selectedTable
             .flatMapLatest { table ->
-                getTableDataItems(table.id)
+                combine(
+                    menu.map { item ->
+                        itemDataStore
+                            .getStringOrNullFlow(ItemData.id(table.id, item.id))
+                            .map { json -> json?.let { ItemData.parse(it) }.asItem(item) }
+
+                    }
+                ) {
+                    it.toList()
+                }
                     .map { items -> TableData(table, items) }
             }
 
@@ -50,14 +55,4 @@ class TableDataRepository(
         val itemData = item.asItemData(tableId)
         itemDataStore.putString(itemData.id, itemData.serialize())
     }
-
-    private fun getTableDataItems(tableId: TableId): Flow<List<TableData.Item>> =
-        flow {
-            menu.asFlow()
-                .flatMapLatest { item ->
-                    itemDataStore
-                        .getStringOrNullFlow(ItemData.id(tableId, item.id))
-                        .map { json -> json?.let { ItemData.parse(it) }.asItem(item) }
-                }.toList(mutableListOf())
-        }
 }
