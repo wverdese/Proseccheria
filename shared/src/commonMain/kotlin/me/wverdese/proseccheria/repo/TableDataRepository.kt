@@ -32,19 +32,26 @@ class TableDataRepository(
     val selectedTable: StateFlow<Table> = _selectedTable
 
     val observeTableData: Flow<TableData> =
+        // update when a table is selected
         selectedTable
             .flatMapLatest { table ->
                 combine(
+                    // convert each menuItem in a Flow<TableData.Item>
                     menu.map { item ->
                         itemDataStore
-                            .getStringOrNullFlow(ItemData.id(table.id, item.id))
-                            .map { json -> json?.let { ItemData.parse(it) }.asItem(item) }
-
+                            .getStringOrNullFlow(
+                                ItemData.id(table.id, item.id)
+                            ) // fetch json and update when it's changed (thanks to flatMapLatest)
+                            .map { json ->
+                                json?.let { ItemData.parse(it) }.asItem(item)
+                            } // parse stored json into a TableData.Item
                     }
                 ) {
                     it.toList()
-                }
-                    .map { items -> TableData(table, items) }
+                } // put all the TableData.Items in a list
+                    .map { items ->
+                        TableData(table, items)
+                    } // finally, wrap up the TableData
             }
 
     fun selectTable(tableId: TableId) {
