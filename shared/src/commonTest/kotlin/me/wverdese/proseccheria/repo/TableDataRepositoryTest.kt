@@ -188,4 +188,36 @@ class TableDataRepositoryTest {
             assertEquals(wineItemUpdated, tableData.items.find { it.item == wine })
         }
     }
+
+    @Test
+    fun `test clear`() = runTest(context = testCoroutineDispatcher) {
+        val tableId = tables.first().id
+        val foodItem = TableData.Item.FoodItem(food, quantity = 2, notes = "test")
+        val wineItem = TableData.Item.WineItem(wine, quantity = 2, notes = "test", vessel = GLASS)
+        val otherItem = TableData.Item.OtherItem(other, quantity = 2, notes = "test")
+        val foodItemCleared = TableData.Item.FoodItem(food, quantity = null, notes = null)
+        val wineItemCleared = TableData.Item.WineItem(wine, quantity = null, notes = null, vessel = null)
+        val otherItemCleared = TableData.Item.OtherItem(other, quantity = null, notes = null)
+
+        repo.observeTableData.test {
+            // update check
+            repo.selectTable(tableId)
+            repo.update(tableId, foodItem)
+            repo.update(tableId, wineItem)
+            repo.update(tableId, otherItem)
+            skipItems(3)
+            var tableData = awaitItem()
+            assertEquals(tableId, tableData.table.id)
+            assertEquals(foodItem, tableData.items.find { it.item == food })
+            assertEquals(wineItem, tableData.items.find { it.item == wine })
+            assertEquals(otherItem, tableData.items.find { it.item == other })
+            // clear check
+            repo.clear(tableId)
+            skipItems(2)
+            tableData = awaitItem()
+            assertEquals(foodItemCleared, tableData.items.find { it.item == food })
+            assertEquals(wineItemCleared, tableData.items.find { it.item == wine })
+            assertEquals(otherItemCleared, tableData.items.find { it.item == other })
+        }
+    }
 }

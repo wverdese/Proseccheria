@@ -62,4 +62,15 @@ class TableDataRepository(
         val itemData = item.asItemData(tableId)
         itemDataStore.putString(itemData.id, itemData.serialize())
     }
+
+    suspend fun clear(tableId: TableId) {
+        itemDataStore
+            .keys()
+            .filter {
+                it.startsWith(tableId)
+            }
+            .forEach {
+                itemDataStore.remove(it)
+            }
+    }
 }
