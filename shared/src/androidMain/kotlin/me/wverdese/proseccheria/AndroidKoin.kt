@@ -10,7 +10,6 @@ import com.russhwolf.settings.ExperimentalSettingsApi
 import com.russhwolf.settings.ExperimentalSettingsImplementation
 import com.russhwolf.settings.coroutines.FlowSettings
 import com.russhwolf.settings.datastore.DataStoreSettings
-import org.koin.core.qualifier.Qualifier
 import org.koin.dsl.module
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "datastore")

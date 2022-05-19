@@ -18,6 +18,10 @@ android {
         }
     }
 
+    buildFeatures {
+        compose = true
+    }
+
     composeOptions {
         kotlinCompilerExtensionVersion = Version.Compose.MAIN
     }

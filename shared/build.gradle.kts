@@ -34,7 +34,7 @@ kotlin {
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.1-native-mt")
                 /* Settings */
                 implementation("com.russhwolf:multiplatform-settings:0.9")
-                implementation("com.russhwolf:multiplatform-settings-coroutines-native-mt:0.9")
+                implementation("com.russhwolf:multiplatform-settings-coroutines:0.9")
             }
         }
         val commonTest by getting {

@@ -38,7 +38,6 @@ import me.wverdese.proseccheria.model.GLASS
 import me.wverdese.proseccheria.model.Other
 import me.wverdese.proseccheria.model.Table
 import me.wverdese.proseccheria.model.TableId
-import me.wverdese.proseccheria.model.VesselType
 import me.wverdese.proseccheria.model.Wine
 import me.wverdese.proseccheria.model.createTables
 import me.wverdese.proseccheria.model.tables
