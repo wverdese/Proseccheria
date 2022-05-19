@@ -18,6 +18,7 @@ import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -70,7 +71,7 @@ fun OrderScreen(
                 },
                 actions = {
                     IconButton(onClick = { }) {
-                        Icon(Icons.Filled.Clear, contentDescription = "Clear Table")
+                        Icon(Icons.Filled.Delete, contentDescription = "Clear Table")
                     }
                 },
             )
@@ -85,7 +86,7 @@ fun OrderScreen(
 fun TableSelection(selected: Table, tables: List<Table>, onSelected: (TableId) -> Unit) {
     var expanded by remember { mutableStateOf(false) }
 
-    Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+    Box {
         Row(
             Modifier
                 .padding(24.dp)

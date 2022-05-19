@@ -1,4 +1,4 @@
-package com.airthings.ble.waver2.theme
+package me.wverdese.proseccheria.android.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.MaterialTheme

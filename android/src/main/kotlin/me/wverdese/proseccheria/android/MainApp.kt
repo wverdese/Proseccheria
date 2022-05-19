@@ -4,6 +4,7 @@ import android.app.Application
 import me.wverdese.proseccheria.android.screen.order.OrderScreen
 import me.wverdese.proseccheria.android.screen.order.OrderScreenViewModel
 import me.wverdese.proseccheria.initKoin
+import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
@@ -11,7 +12,7 @@ class MainApp : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        initKoin(appModule = appModule)
+        initKoin(onStart = { androidContext(this@MainApp) }, appModule = appModule)
     }
 }
 

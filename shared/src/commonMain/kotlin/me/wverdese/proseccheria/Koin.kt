@@ -6,8 +6,9 @@ import org.koin.core.context.startKoin
 import org.koin.core.module.Module
 import org.koin.dsl.module
 
-fun initKoin(appModule: Module): KoinApplication =
+fun initKoin(onStart: KoinApplication.() -> Unit, appModule: Module): KoinApplication =
     startKoin {
+        onStart()
         modules(
             appModule,
             platformModule,

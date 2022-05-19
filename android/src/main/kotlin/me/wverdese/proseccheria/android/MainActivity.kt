@@ -4,7 +4,7 @@ import android.os.Bundle
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import com.airthings.ble.waver2.theme.AppTheme
+import me.wverdese.proseccheria.android.theme.AppTheme
 import me.wverdese.proseccheria.android.screen.order.OrderScreen
 
 

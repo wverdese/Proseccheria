@@ -1,6 +1,6 @@
 @file:Suppress("MagicNumber")
 
-package com.airthings.ble.waver2.theme
+package me.wverdese.proseccheria.android.theme
 
 import androidx.compose.ui.graphics.Color
 
