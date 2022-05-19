@@ -97,7 +97,7 @@ fun TableSelection(selected: Table, tables: List<Table>, onSelected: (TableId) -
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(text = selected.name, fontSize = 18.sp, modifier = Modifier.padding(end = 8.dp))
+            Text(text = selected.name, modifier = Modifier.padding(end = 8.dp))
             Icon(imageVector = Icons.Filled.ArrowDropDown, contentDescription = "Table Dropdown")
 
             DropdownMenu(expanded = expanded, onDismissRequest = {
