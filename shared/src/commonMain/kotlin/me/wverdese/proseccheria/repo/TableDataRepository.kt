@@ -1,3 +1,5 @@
+
+
 package me.wverdese.proseccheria.repo
 
 import com.russhwolf.settings.ExperimentalSettingsApi
@@ -20,10 +22,9 @@ import me.wverdese.proseccheria.model.TableId
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 
-@ExperimentalCoroutinesApi
-@ExperimentalSettingsApi
+@OptIn(ExperimentalCoroutinesApi::class, ExperimentalSettingsApi::class)
 class TableDataRepository(
-    private val tables: List<Table> = me.wverdese.proseccheria.model.tables,
+    val tables: List<Table> = me.wverdese.proseccheria.model.tables,
     private val menu: Menu = me.wverdese.proseccheria.model.menu,
 ) : KoinComponent {
     private val itemDataStore: FlowSettings = get()
