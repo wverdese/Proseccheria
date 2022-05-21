@@ -30,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import me.wverdese.proseccheria.android.theme.Black
 import me.wverdese.proseccheria.domain.TableData
 import me.wverdese.proseccheria.domain.TableData.Item.FoodItem
 import me.wverdese.proseccheria.domain.TableData.Item.OtherItem
@@ -71,7 +72,7 @@ fun OrderScreen(
                 },
                 actions = {
                     IconButton(onClick = { }) {
-                        Icon(Icons.Filled.Delete, contentDescription = "Clear Table")
+                        Icon(Icons.Filled.Delete, tint = Black, contentDescription = "Clear Table")
                     }
                 },
             )
