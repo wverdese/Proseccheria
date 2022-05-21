@@ -18,8 +18,11 @@ class OrderScreenViewModel(
 
     init {
         viewModelScope.launch {
-            tableDataRepo.observeTableData.collect {
-                state = state.copy(tableData = it)
+            tableDataRepo.observeTableData.collect { data ->
+                state = state.copy(
+                    table = data.table,
+                    groupedItems = data.items.groupBy { it.item.type.name }
+                )
             }
         }
     }
@@ -30,9 +33,7 @@ class OrderScreenViewModel(
 
     private fun initScreenState() = OrderScreenState(
         tables = tableDataRepo.tables,
-        tableData = TableData(
-            table = tableDataRepo.tables.first(),
-            items = emptyList()
-        )
+        table = tableDataRepo.tables.first(),
+        groupedItems = emptyMap(),
     )
 }

@@ -5,5 +5,6 @@ import me.wverdese.proseccheria.model.Table
 
 data class OrderScreenState(
     val tables: List<Table>,
-    val tableData: TableData,
+    val table: Table,
+    val groupedItems: Map<String, List<TableData.Item>>,
 )

@@ -3,6 +3,7 @@
 package me.wverdese.proseccheria.android.screen.order
 
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -38,8 +39,7 @@ import kotlinx.coroutines.launch
 import me.wverdese.proseccheria.android.theme.AppTheme
 import me.wverdese.proseccheria.domain.TableData
 import me.wverdese.proseccheria.domain.TableData.Item.FoodItem
-import me.wverdese.proseccheria.domain.TableData.Item.OtherItem
-import me.wverdese.proseccheria.domain.TableData.Item.WineItem
+import me.wverdese.proseccheria.model.BOTTLE
 import me.wverdese.proseccheria.model.Food
 import me.wverdese.proseccheria.model.GLASS
 import me.wverdese.proseccheria.model.Other
@@ -57,6 +57,7 @@ fun OrderScreen(viewModel: OrderScreenViewModel = getViewModel()) {
     )
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun OrderScreen(
     state: OrderScreenState,
@@ -87,7 +88,7 @@ fun OrderScreen(
                         }
                     },
                     title = {
-                        Text(text = tableData.table.name)
+                        Text(text = table.name)
                     },
                     actions = {
                         IconToggleButton(
@@ -141,22 +142,38 @@ fun OrderScreen(
             frontLayerContent = {
                 Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.background) {
                     LazyColumn {
-                        val menu = tableData.items
-                        items(count = menu.size) { index ->
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(all = 16.dp)
-                            ) {
-                                Text(text = menu[index].item.name)
+                        groupedItems.forEach { (section, rows) ->
+                            stickyHeader {
+                                Surface(
+                                    modifier = Modifier
+                                        .fillMaxWidth(),
+                                    color = MaterialTheme.colors.background,
+                                ) {
+                                    Text(
+                                        modifier = Modifier.padding(16.dp),
+                                        text = section,
+                                        style = MaterialTheme.typography.h6,
+                                    )
+                                }
+                            }
+                            items(count = rows.size) { index ->
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(all = 16.dp)
+                                ) {
+                                    Text(
+                                        modifier = Modifier.padding(start = 8.dp),
+                                        text = rows[index].item.name,
+                                        style = MaterialTheme.typography.body1,
+                                    )
+                                }
                             }
                         }
                     }
                 }
             }
-        ) {
-
-        }
+        )
     }
 }
 
@@ -167,9 +184,9 @@ fun OrderScreenPreview() {
         OrderScreen(
             state = OrderScreenState(
                 tables = createTables(16),
-                tableData = TableData(
-                    table = tables.first(),
-                    items = listOf(
+                table = tables.first(),
+                groupedItems = mapOf(
+                    "Antipasti" to listOf(
                         FoodItem(
                             item = Food(
                                 id = "FA-01",
@@ -179,17 +196,33 @@ fun OrderScreenPreview() {
                             quantity = 1,
                             notes = "test"
                         ),
-                        WineItem(
+                    ),
+                    "Prosecchi" to listOf(
+                        TableData.Item.WineItem(
                             item = Wine(
                                 id = "WP-01",
                                 type = Wine.Type.Prosecco,
-                                vessel = Wine.Vessel.BOTH, name = "Valdobbiadene Ex Dry"
+                                vessel = Wine.Vessel.BOTH,
+                                name = "Valdobbiadene Ex Dry"
                             ),
                             quantity = 2,
-                            notes = "test",
+                            notes = "test1",
                             vessel = GLASS
                         ),
-                        OtherItem(
+                        TableData.Item.WineItem(
+                            item = Wine(
+                                id = "WP-04",
+                                type = Wine.Type.Prosecco,
+                                vessel = Wine.Vessel.BOTTLE,
+                                name = "Mont Blanc Cuvee Ex Dry"
+                            ),
+                            quantity = null,
+                            notes = null,
+                            vessel = BOTTLE
+                        ),
+                    ),
+                    "Alcolici" to listOf(
+                        TableData.Item.OtherItem(
                             item = Other(
                                 id = "SC-01",
                                 type = Other.Type.Spirit,
