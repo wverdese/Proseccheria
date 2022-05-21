@@ -22,7 +22,9 @@ class OrderScreenViewModel(
             tableDataRepo.observeTableData.collect { data ->
                 state = state.copy(
                     table = data.table,
-                    groupedItems = data.items.groupBy { it.item.type.name }
+                    groupedItems = data.items
+                        .groupBy { it.item.type.name }
+                        .mapValues { (_, list) -> list.sortedBy { it.item.name } }
                 )
             }
         }

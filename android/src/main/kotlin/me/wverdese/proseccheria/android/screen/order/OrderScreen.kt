@@ -6,6 +6,7 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -86,6 +87,7 @@ fun OrderScreen(
             appBar = {
                 TopAppBar(
                     elevation = 0.dp,
+                    backgroundColor = MaterialTheme.colors.surface,
                     navigationIcon = {
                         IconButton(
                             onClick = {
@@ -109,7 +111,7 @@ fun OrderScreen(
                             onCheckedChange = { viewOrder.value = it }
                         ) {
                             val tint by animateColorAsState(
-                                if (viewOrder.value) MaterialTheme.colors.secondary
+                                if (viewOrder.value) MaterialTheme.colors.primary
                                 else MaterialTheme.colors.onSurface
                             )
                             Icon(
@@ -128,7 +130,7 @@ fun OrderScreen(
                     },
                 )
             },
-            backLayerBackgroundColor = MaterialTheme.colors.primarySurface,
+            backLayerBackgroundColor = MaterialTheme.colors.surface,
             backLayerContent = {
                 LazyColumn {
                     items(count = tables.size) { index ->
@@ -173,16 +175,22 @@ fun OrderScreen(
                                 Box(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .padding(all = 16.dp)
                                         .clickable(onClick = {
                                             clickedItemState.value = rows[index]
                                         })
                                 ) {
-                                    Text(
-                                        modifier = Modifier.padding(start = 8.dp),
-                                        text = rows[index].item.name,
-                                        style = MaterialTheme.typography.body1,
-                                    )
+                                    Column(modifier = Modifier.padding(all = 16.dp)) {
+                                        Text(
+                                            modifier = Modifier.padding(start = 8.dp),
+                                            text = rows[index].item.name,
+                                            style = MaterialTheme.typography.body1,
+                                        )
+                                        Text(
+                                            modifier = Modifier.padding(start = 8.dp, top = 4.dp),
+                                            text = rows[index].notes ?: "",
+                                            style = MaterialTheme.typography.caption,
+                                        )
+                                    }
                                 }
                             }
                         }

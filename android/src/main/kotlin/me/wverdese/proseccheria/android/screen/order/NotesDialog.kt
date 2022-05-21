@@ -39,7 +39,7 @@ fun NotesDialog(
             color = MaterialTheme.colors.background,
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
-                Text(text = item.item.name, style = MaterialTheme.typography.subtitle1)
+                Text(text = item.item.name, style = MaterialTheme.typography.body2)
 
                 OutlinedTextField(
                     modifier = Modifier

@@ -89,7 +89,7 @@ val menu: Menu = listOf(
     Other(id = "B-03", type = Other.Type.Beer, name = "Ringnes 0,6 lt"),
     Other(id = "B-04", type = Other.Type.Beer, name = "Brooklyn lager bottle"),
     /* Water & Soft Drinks */
-    Other(id = "SO-01", type = Other.Type.Soft, name = "All types"),
+    Other(id = "SO-01", type = Other.Type.Soft, name = "Any type"),
     Other(id = "SO-02", type = Other.Type.Soft, name = "Purezza 0,33 lt"),
     Other(id = "SO-03", type = Other.Type.Soft, name = "Purezza 0,5 lt"),
     Other(id = "SO-04", type = Other.Type.Soft, name = "Gazzosa"),
