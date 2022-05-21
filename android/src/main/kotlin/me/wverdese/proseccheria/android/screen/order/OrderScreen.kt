@@ -4,8 +4,9 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
@@ -18,7 +19,6 @@ import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
@@ -30,9 +30,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import me.wverdese.proseccheria.android.theme.Black
-import me.wverdese.proseccheria.android.theme.OnSurfaceDark
+import me.wverdese.proseccheria.android.theme.AppTheme
 import me.wverdese.proseccheria.domain.TableData
 import me.wverdese.proseccheria.domain.TableData.Item.FoodItem
 import me.wverdese.proseccheria.domain.TableData.Item.OtherItem
@@ -74,7 +72,11 @@ fun OrderScreen(
                 },
                 actions = {
                     IconButton(onClick = { }) {
-                        Icon(Icons.Filled.Delete, tint = MaterialTheme.colors.onSurface, contentDescription = "Clear Table")
+                        Icon(
+                            Icons.Filled.Delete,
+                            tint = MaterialTheme.colors.onSurface,
+                            contentDescription = "Clear Table"
+                        )
                     }
                 },
             )
@@ -92,20 +94,22 @@ fun TableSelection(selected: Table, tables: List<Table>, onSelected: (TableId) -
     Box {
         Row(
             Modifier
-                .padding(24.dp)
                 .clickable {
                     expanded = !expanded
                 }
-                .padding(8.dp),
+                .fillMaxHeight()
+                .padding(start = 8.dp),
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(text = selected.name, modifier = Modifier.padding(end = 8.dp))
             Icon(imageVector = Icons.Filled.ArrowDropDown, contentDescription = "Table Dropdown")
 
-            DropdownMenu(expanded = expanded, onDismissRequest = {
-                expanded = false
-            }) {
+            DropdownMenu(
+                modifier = Modifier.heightIn(0.dp, 300.dp),
+                expanded = expanded,
+                onDismissRequest = { expanded = false }
+            ) {
                 tables.forEach { table ->
                     DropdownMenuItem(onClick = {
                         expanded = false
@@ -122,44 +126,46 @@ fun TableSelection(selected: Table, tables: List<Table>, onSelected: (TableId) -
 @Preview
 @Composable
 fun OrderScreenPreview() {
-    OrderScreen(
-        scaffoldState = rememberScaffoldState(),
-        state = OrderScreenState(
-            tables = createTables(1),
-            tableData = TableData(
-                table = tables.first(),
-                items = listOf(
-                    FoodItem(
-                        item = Food(
-                            id = "FA-01",
-                            type = Food.Type.Antipasto,
-                            name = "Tagliere salumi e formaggi"
+    AppTheme {
+        OrderScreen(
+            scaffoldState = rememberScaffoldState(),
+            state = OrderScreenState(
+                tables = createTables(16),
+                tableData = TableData(
+                    table = tables.first(),
+                    items = listOf(
+                        FoodItem(
+                            item = Food(
+                                id = "FA-01",
+                                type = Food.Type.Antipasto,
+                                name = "Tagliere salumi e formaggi"
+                            ),
+                            quantity = 1,
+                            notes = "test"
                         ),
-                        quantity = 1,
-                        notes = "test"
-                    ),
-                    WineItem(
-                        item = Wine(
-                            id = "WP-01",
-                            type = Wine.Type.Prosecco,
-                            vessel = Wine.Vessel.BOTH, name = "Valdobbiadene Ex Dry"
+                        WineItem(
+                            item = Wine(
+                                id = "WP-01",
+                                type = Wine.Type.Prosecco,
+                                vessel = Wine.Vessel.BOTH, name = "Valdobbiadene Ex Dry"
+                            ),
+                            quantity = 2,
+                            notes = "test",
+                            vessel = GLASS
                         ),
-                        quantity = 2,
-                        notes = "test",
-                        vessel = GLASS
-                    ),
-                    OtherItem(
-                        item = Other(
-                            id = "SC-01",
-                            type = Other.Type.Spirit,
-                            name = "Aperol Spritz"
-                        ),
-                        quantity = 3,
-                        notes = "test test"
+                        OtherItem(
+                            item = Other(
+                                id = "SC-01",
+                                type = Other.Type.Spirit,
+                                name = "Aperol Spritz"
+                            ),
+                            quantity = 3,
+                            notes = "test test"
+                        )
                     )
                 )
-            )
-        ),
-        onTableSelected = {}
-    )
+            ),
+            onTableSelected = {}
+        )
+    }
 }
