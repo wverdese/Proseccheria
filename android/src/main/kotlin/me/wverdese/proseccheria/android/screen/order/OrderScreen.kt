@@ -42,6 +42,7 @@ import me.wverdese.proseccheria.domain.TableData.Item.FoodItem
 import me.wverdese.proseccheria.model.BOTTLE
 import me.wverdese.proseccheria.model.Food
 import me.wverdese.proseccheria.model.GLASS
+import me.wverdese.proseccheria.model.NotesType
 import me.wverdese.proseccheria.model.Other
 import me.wverdese.proseccheria.model.TableId
 import me.wverdese.proseccheria.model.Wine
@@ -53,7 +54,8 @@ import org.koin.androidx.compose.getViewModel
 fun OrderScreen(viewModel: OrderScreenViewModel = getViewModel()) {
     OrderScreen(
         state = viewModel.state,
-        onTableSelected = { viewModel.selectTable(it) }
+        onTableSelected = viewModel::selectTable,
+        onNotesChanged = viewModel::editNotes,
     )
 }
 
@@ -62,12 +64,23 @@ fun OrderScreen(viewModel: OrderScreenViewModel = getViewModel()) {
 fun OrderScreen(
     state: OrderScreenState,
     onTableSelected: (TableId) -> Unit,
+    onNotesChanged: (item: TableData.Item, NotesType?) -> Unit,
 ) {
     val coroutineScope = rememberCoroutineScope()
     val scaffoldState = rememberBackdropScaffoldState(initialValue = BackdropValue.Concealed)
     val viewOrder = remember { mutableStateOf(false) }
+    val clickedItemState = remember { mutableStateOf<TableData.Item?>(null) }
 
     with(state) {
+        val item = clickedItemState.value
+        if (item != null) {
+            NotesDialog(
+                item = item,
+                onConfirmClicked = onNotesChanged,
+                onDismiss = { clickedItemState.value = null }
+            )
+        }
+
         BackdropScaffold(
             scaffoldState = scaffoldState,
             appBar = {
@@ -161,6 +174,9 @@ fun OrderScreen(
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .padding(all = 16.dp)
+                                        .clickable(onClick = {
+                                            clickedItemState.value = rows[index]
+                                        })
                                 ) {
                                     Text(
                                         modifier = Modifier.padding(start = 8.dp),
@@ -234,7 +250,8 @@ fun OrderScreenPreview() {
                     )
                 )
             ),
-            onTableSelected = {}
+            onTableSelected = {},
+            onNotesChanged = { _, _ -> }
         )
     }
 }

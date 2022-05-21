@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import me.wverdese.proseccheria.domain.TableData
+import me.wverdese.proseccheria.model.NotesType
 import me.wverdese.proseccheria.model.TableId
 import me.wverdese.proseccheria.repo.TableDataRepository
 
@@ -29,6 +30,12 @@ class OrderScreenViewModel(
 
     fun selectTable(tableId: TableId) {
         tableDataRepo.selectTable(tableId)
+    }
+
+    fun editNotes(item: TableData.Item, notes: NotesType?) {
+        viewModelScope.launch {
+            tableDataRepo.updateNotes(state.table.id, item, notes)
+        }
     }
 
     private fun initScreenState() = OrderScreenState(
