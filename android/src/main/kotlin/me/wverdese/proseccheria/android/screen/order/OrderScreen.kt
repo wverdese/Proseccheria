@@ -11,6 +11,7 @@ import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.ScaffoldState
 import androidx.compose.material.Text
@@ -31,6 +32,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import me.wverdese.proseccheria.android.theme.Black
+import me.wverdese.proseccheria.android.theme.OnSurfaceDark
 import me.wverdese.proseccheria.domain.TableData
 import me.wverdese.proseccheria.domain.TableData.Item.FoodItem
 import me.wverdese.proseccheria.domain.TableData.Item.OtherItem
@@ -72,7 +74,7 @@ fun OrderScreen(
                 },
                 actions = {
                     IconButton(onClick = { }) {
-                        Icon(Icons.Filled.Delete, tint = Black, contentDescription = "Clear Table")
+                        Icon(Icons.Filled.Delete, tint = MaterialTheme.colors.onSurface, contentDescription = "Clear Table")
                     }
                 },
             )
