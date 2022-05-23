@@ -15,5 +15,5 @@ val Green500 = Color(0xFF429c86)
 
 /* Other */
 val Black = Color(0xFF121212)
-val SurfaceDark = Color(0xFF333123)
-val OnSurfaceDark = Color(0xFF9e9c88)
+val SurfaceDark = Color(0xFF514b11)
+val OnSurfaceDark = Color(0xFFeeede4)
