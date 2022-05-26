@@ -9,6 +9,7 @@ import kotlinx.coroutines.launch
 import me.wverdese.proseccheria.domain.TableData
 import me.wverdese.proseccheria.model.NotesType
 import me.wverdese.proseccheria.model.QuantityType
+import me.wverdese.proseccheria.model.Table
 import me.wverdese.proseccheria.model.TableId
 import me.wverdese.proseccheria.repo.TableDataRepository
 
@@ -31,8 +32,8 @@ class OrderScreenViewModel(
         }
     }
 
-    fun selectTable(tableId: TableId) {
-        tableDataRepo.selectTable(tableId)
+    fun selectTable(table: Table) {
+        tableDataRepo.selectTable(table.id)
     }
 
     fun editNotes(item: TableData.Item, notes: NotesType?) {
@@ -56,6 +57,12 @@ class OrderScreenViewModel(
     fun changeVessel(item: TableData.Item.WineItem) {
         viewModelScope.launch {
             tableDataRepo.changeVessel(state.table.id, item)
+        }
+    }
+
+    fun clearTable(table: Table) {
+        viewModelScope.launch {
+            tableDataRepo.clear(table.id)
         }
     }
 

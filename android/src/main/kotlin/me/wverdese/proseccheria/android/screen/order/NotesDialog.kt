@@ -39,15 +39,15 @@ fun NotesDialog(
             color = MaterialTheme.colors.background,
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
-                Text(text = item.item.name)
+                Text(text = "Add notes", style = MaterialTheme.typography.h6)
+
+                Text(modifier = Modifier.padding(top = 16.dp, bottom = 8.dp), text = item.item.name)
 
                 OutlinedTextField(
                     modifier = Modifier
-                        .padding(top = 8.dp)
                         .fillMaxWidth()
                         .verticalScroll(rememberScrollState())
-                        .weight(weight = 1f, fill = false)
-                        .padding(vertical = 16.dp),
+                        .weight(weight = 1f, fill = false),
                     label = { Text(text = "Note") },
                     value = textState.value,
                     onValueChange = { textState.value = it },

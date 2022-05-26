@@ -81,7 +81,7 @@ class TableDataRepository(
         item: TableData.Item,
         update: QuantityType.() -> QuantityType
     ) {
-        val coercedQuantity = item.quantity.update().coerceIn(0, 9)
+        val coercedQuantity = item.quantity.update().coerceIn(0, 99)
         val data = item.asItemData(tableId)
         updateIfNeeded(data, data.copy(quantity = coercedQuantity))
     }

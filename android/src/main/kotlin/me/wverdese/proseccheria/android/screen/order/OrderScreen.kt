@@ -5,6 +5,7 @@ package me.wverdese.proseccheria.android.screen.order
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -27,6 +28,7 @@ import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
+import androidx.compose.material.TextButton
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
@@ -44,6 +46,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import kotlinx.coroutines.launch
 import me.wverdese.proseccheria.android.R
 import me.wverdese.proseccheria.android.theme.AppTheme
@@ -55,6 +58,7 @@ import me.wverdese.proseccheria.model.GLASS
 import me.wverdese.proseccheria.model.NotesType
 import me.wverdese.proseccheria.model.Other
 import me.wverdese.proseccheria.model.QuantityType
+import me.wverdese.proseccheria.model.Table
 import me.wverdese.proseccheria.model.TableId
 import me.wverdese.proseccheria.model.VesselType
 import me.wverdese.proseccheria.model.Wine
@@ -66,11 +70,12 @@ import org.koin.androidx.compose.getViewModel
 fun OrderScreen(viewModel: OrderScreenViewModel = getViewModel()) {
     OrderScreen(
         state = viewModel.state,
-        onTableSelected = viewModel::selectTable,
-        onNotesChanged = viewModel::editNotes,
+        onSelectTable = viewModel::selectTable,
+        onClearTable = viewModel::clearTable,
+        onEditNotes = viewModel::editNotes,
         onIncrementQuantity = viewModel::incrementQuantity,
         onDecrementQuantity = viewModel::decrementQuantity,
-        onVesselChange = viewModel::changeVessel,
+        onChangeVessel = viewModel::changeVessel,
     )
 }
 
@@ -78,27 +83,36 @@ fun OrderScreen(viewModel: OrderScreenViewModel = getViewModel()) {
 @Composable
 fun OrderScreen(
     state: OrderScreenState,
-    onTableSelected: (TableId) -> Unit,
-    onNotesChanged: (item: TableData.Item, NotesType?) -> Unit,
+    onSelectTable: (Table) -> Unit,
+    onClearTable: (table: Table) -> Unit,
+    onEditNotes: (item: TableData.Item, NotesType?) -> Unit,
     onIncrementQuantity: (item: TableData.Item) -> Unit,
     onDecrementQuantity: (item: TableData.Item) -> Unit,
-    onVesselChange: (item: TableData.Item.WineItem) -> Unit,
+    onChangeVessel: (item: TableData.Item.WineItem) -> Unit,
 ) {
     val coroutineScope = rememberCoroutineScope()
     val scaffoldState = rememberBackdropScaffoldState(initialValue = BackdropValue.Concealed)
     val viewOrder = remember { mutableStateOf(false) }
     val clickedItemState = remember { mutableStateOf<TableData.Item?>(null) }
+    val deleteTableState = remember { mutableStateOf<Table?>(null) }
+
+    clickedItemState.value?.also {
+        NotesDialog(
+            item = it,
+            onConfirmClicked = onEditNotes,
+            onDismiss = { clickedItemState.value = null }
+        )
+    }
+
+    deleteTableState.value?.also {
+        ConfirmDialog(
+            table = it,
+            onConfirmClicked = { onClearTable(it) },
+            onDismiss = { deleteTableState.value = null }
+        )
+    }
 
     with(state) {
-        val item = clickedItemState.value
-        if (item != null) {
-            NotesDialog(
-                item = item,
-                onConfirmClicked = onNotesChanged,
-                onDismiss = { clickedItemState.value = null }
-            )
-        }
-
         BackdropScaffold(
             scaffoldState = scaffoldState,
             appBar = {
@@ -137,7 +151,7 @@ fun OrderScreen(
                                 tint = tint,
                             )
                         }
-                        IconButton(onClick = { }) {
+                        IconButton(onClick = { deleteTableState.value = table }) {
                             Icon(
                                 Icons.Filled.Delete,
                                 tint = MaterialTheme.colors.onSurface,
@@ -154,7 +168,7 @@ fun OrderScreen(
                         Box(
                             modifier = Modifier
                                 .clickable(onClick = {
-                                    onTableSelected(tables[index].id)
+                                    onSelectTable(tables[index])
                                     coroutineScope.launch {
                                         scaffoldState.conceal()
                                     }
@@ -222,7 +236,7 @@ fun OrderScreen(
                                         VesselWidget(
                                             canChangeVessel = row.canChangeVessel,
                                             vessel = row.vessel,
-                                            onVesselClick = { onVesselChange(row) }
+                                            onVesselClick = { onChangeVessel(row) }
                                         )
                                         Spacer(modifier = Modifier.width(8.dp))
                                     }
@@ -290,6 +304,49 @@ fun VesselWidget(
                 painter = painterResource(if (vessel == GLASS) R.drawable.ic_glass else R.drawable.ic_bottle),
                 contentDescription = if (vessel == GLASS) "Glass" else "Bottle",
             )
+        }
+    }
+}
+
+@Composable
+fun ConfirmDialog(
+    table: Table,
+    onConfirmClicked: () -> Unit,
+    onDismiss: () -> Unit,
+) {
+    Dialog(
+        onDismissRequest = {
+            onDismiss()
+        },
+    ) {
+        Surface(
+            shape = MaterialTheme.shapes.medium,
+            color = MaterialTheme.colors.background,
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text(text = "Warning", style = MaterialTheme.typography.h6)
+                Text(
+                    modifier = Modifier
+                        .padding(top = 16.dp)
+                        .fillMaxWidth(),
+                    text = "You're about to delete all the information stored for ${table.name}. Are you sure?"
+                )
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                    TextButton(
+                        onClick = {
+                            onDismiss()
+                        }
+                    ) {
+                        Text(text = "Cancel")
+                    }
+                    TextButton(onClick = {
+                        onConfirmClicked()
+                        onDismiss()
+                    }) {
+                        Text(text = "Proceed")
+                    }
+                }
+            }
         }
     }
 }
@@ -386,11 +443,12 @@ fun OrderScreenPreview() {
                     )
                 )
             ),
-            onTableSelected = {},
-            onNotesChanged = { _, _ -> },
+            onSelectTable = {},
+            onClearTable = {},
+            onEditNotes = { _, _ -> },
             onIncrementQuantity = {},
             onDecrementQuantity = {},
-            onVesselChange = {}
+            onChangeVessel = {},
         )
     }
 }
