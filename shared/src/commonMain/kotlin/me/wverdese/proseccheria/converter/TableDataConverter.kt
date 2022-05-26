@@ -23,27 +23,22 @@ fun TableData.Item.asItemData(tableId: TableId) = ItemData(
 fun ItemData?.asItem(menuItem: MenuItem): TableData.Item =
     when (menuItem) {
         is Food -> TableData.Item.FoodItem(
-            hasStoredData = hasStoredData,
             item = menuItem,
             quantity = quantityOrDefault,
             notes = this?.notes
         )
         is Other -> TableData.Item.OtherItem(
-            hasStoredData = hasStoredData,
             item = menuItem,
             quantity = quantityOrDefault,
             notes = this?.notes
         )
         is Wine -> TableData.Item.WineItem(
-            hasStoredData = hasStoredData,
             item = menuItem,
             quantity = quantityOrDefault,
             notes = this?.notes,
             vessel = vesselOrDefault(menuItem.vessel)
         )
     }
-
-private val ItemData?.hasStoredData: Boolean get() = this != null
 
 private val ItemData?.quantityOrDefault: QuantityType get() = this?.quantity ?: 0
 

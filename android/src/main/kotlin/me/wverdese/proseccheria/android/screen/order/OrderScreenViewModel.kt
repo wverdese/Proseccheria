@@ -22,8 +22,7 @@ class OrderScreenViewModel(
             tableDataRepo.observeTableData.collect { data ->
                 state = state.copy(
                     table = data.table,
-                    isClearTableButtonEnabled = data.hasStoredData,
-                    isViewOrderButtonEnabled = data.hasOrders,
+                    isClearTableButtonEnabled = data.hasOrders,
                     groupedItems = data.items
                         .groupBy { it.item.type.name }
                         .mapValues { (_, list) -> list.sortedBy { it.item.name } }
@@ -70,7 +69,6 @@ class OrderScreenViewModel(
         tables = tableDataRepo.tables,
         table = tableDataRepo.tables.first(),
         isClearTableButtonEnabled = false,
-        isViewOrderButtonEnabled = false,
         groupedItems = emptyMap(),
     )
 }

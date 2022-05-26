@@ -381,8 +381,7 @@ fun OrderScreenPreview() {
             state = OrderScreenState(
                 tables = createTables(16),
                 table = tables.first(),
-                isClearTableButtonEnabled = false,
-                isViewOrderButtonEnabled = true,
+                isClearTableButtonEnabled = true,
                 groupedItems = mapOf(
                     "Antipasti" to listOf(
                         FoodItem(
@@ -393,7 +392,6 @@ fun OrderScreenPreview() {
                             ),
                             quantity = 1,
                             notes = "test",
-                            hasStoredData = true
                         ),
                     ),
                     "Prosecchi" to listOf(
@@ -407,7 +405,6 @@ fun OrderScreenPreview() {
                             quantity = 2,
                             notes = "test1",
                             vessel = GLASS,
-                            hasStoredData = true
                         ),
                         TableData.Item.WineItem(
                             item = Wine(
@@ -419,7 +416,6 @@ fun OrderScreenPreview() {
                             quantity = 0,
                             notes = null,
                             vessel = BOTTLE,
-                            hasStoredData = true
                         ),
                     ),
                     "Altro" to listOf(
@@ -431,7 +427,6 @@ fun OrderScreenPreview() {
                             ),
                             quantity = 3,
                             notes = "test test",
-                            hasStoredData = true
                         ),
                         TableData.Item.OtherItem(
                             item = Other(
@@ -441,7 +436,6 @@ fun OrderScreenPreview() {
                             ),
                             quantity = 0,
                             notes = null,
-                            hasStoredData = false
                         )
                     )
                 )
