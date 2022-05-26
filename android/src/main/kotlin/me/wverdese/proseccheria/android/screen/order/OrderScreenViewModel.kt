@@ -9,10 +9,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import me.wverdese.proseccheria.domain.TableData
+import me.wverdese.proseccheria.domain.firstTableItems
 import me.wverdese.proseccheria.model.GLASS
 import me.wverdese.proseccheria.model.NotesType
 import me.wverdese.proseccheria.model.Table
 import me.wverdese.proseccheria.model.VesselType
+import me.wverdese.proseccheria.model.firstTable
 import me.wverdese.proseccheria.repo.TableDataRepository
 
 class OrderScreenViewModel(
@@ -30,6 +32,7 @@ class OrderScreenViewModel(
                 .combine(mode) { data, mode -> data to mode }
                 .collect { (data, mode) ->
                     state = state.copy(
+                        tables = data.tables,
                         table = data.table,
                         isClearTableButtonEnabled = data.hasOrders,
                         mode = if (mode == Mode.EDIT)
@@ -92,8 +95,8 @@ class OrderScreenViewModel(
     }
 
     private fun initScreenState() = OrderScreenState(
-        tables = tableDataRepo.tables,
-        table = tableDataRepo.tables.first(),
+        tables = firstTableItems(),
+        table = firstTable(),
         isClearTableButtonEnabled = false,
         mode = OrderScreenState.Mode.Edit(groupedItems = emptyMap())
     )

@@ -8,12 +8,19 @@ import me.wverdese.proseccheria.model.QuantityType
 import me.wverdese.proseccheria.model.Table
 import me.wverdese.proseccheria.model.VesselType
 import me.wverdese.proseccheria.model.Wine
+import me.wverdese.proseccheria.model.tables
 
 data class TableData(
+    val tables: List<TableItem>,
     val table: Table,
     val items: List<Item>
 ) {
     val hasOrders: Boolean = items.find { it.hasOrder } != null
+
+    data class TableItem(
+        val table: Table,
+        val hasStoredData: Boolean,
+    )
 
     sealed interface Item {
         val item: MenuItem
@@ -44,3 +51,5 @@ data class TableData(
         ): Item
     }
 }
+
+fun firstTableItems() = tables.map { TableData.TableItem(it, false) }

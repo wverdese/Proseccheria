@@ -166,10 +166,11 @@ fun OrderScreen(
             backLayerContent = {
                 LazyColumn {
                     items(count = tables.size) { index ->
+                        val table = tables[index].table
                         Box(
                             modifier = Modifier
                                 .clickable(onClick = {
-                                    onSelectTable(tables[index])
+                                    onSelectTable(table)
                                     coroutineScope.launch {
                                         scaffoldState.conceal()
                                     }
@@ -177,10 +178,15 @@ fun OrderScreen(
                                 .fillMaxWidth()
                                 .padding(all = 16.dp)
                         ) {
+                            val tint = if (tables[index].hasStoredData)
+                                MaterialTheme.colors.primary
+                            else
+                                MaterialTheme.colors.onSurface
                             Text(
                                 modifier = Modifier.padding(start = 8.dp),
-                                text = tables[index].name,
+                                text = table.name,
                                 style = MaterialTheme.typography.h6,
+                                color = tint,
                             )
                         }
                     }
@@ -422,7 +428,9 @@ fun OrderScreenEditPreview() {
     AppTheme {
         OrderScreen(
             state = OrderScreenState(
-                tables = createTables(16),
+                tables = createTables(16).mapIndexed { index, table ->
+                    TableData.TableItem(table, index % 2 == 0)
+                },
                 table = tables.first(),
                 isClearTableButtonEnabled = true,
                 mode = OrderScreenState.Mode.Edit(
@@ -502,7 +510,9 @@ fun OrderScreenViewPreview() {
     AppTheme {
         OrderScreen(
             state = OrderScreenState(
-                tables = createTables(16),
+                tables = createTables(16).mapIndexed { index, table ->
+                    TableData.TableItem(table, index % 2 == 0)
+                },
                 table = tables.first(),
                 isClearTableButtonEnabled = true,
                 mode = OrderScreenState.Mode.View(

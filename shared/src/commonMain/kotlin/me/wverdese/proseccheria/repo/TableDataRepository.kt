@@ -2,6 +2,7 @@ package me.wverdese.proseccheria.repo
 
 import com.russhwolf.settings.ExperimentalSettingsApi
 import com.russhwolf.settings.coroutines.FlowSettings
+import kotlin.coroutines.EmptyCoroutineContext.plus
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,7 +27,7 @@ import org.koin.core.component.get
 
 @OptIn(ExperimentalCoroutinesApi::class, ExperimentalSettingsApi::class)
 class TableDataRepository(
-    val tables: List<Table> = me.wverdese.proseccheria.model.tables,
+    private val tables: List<Table> = me.wverdese.proseccheria.model.tables,
     private val menu: Menu = me.wverdese.proseccheria.model.menu,
 ) : KoinComponent {
     private val itemDataStore: FlowSettings = get()
@@ -55,7 +56,13 @@ class TableDataRepository(
                     it.sortedWith(itemComparator)
                 } // put all the TableData.Items in a sorted list
                     .map { items ->
-                        TableData(table, items)
+                        val tableItems = tables.map { table ->
+                            TableData.TableItem(
+                                table = table,
+                                hasStoredData = itemDataStore.keys().find { key -> key.startsWith(table.id) } != null
+                            )
+                        } // compute hasStoredData information for TableItems
+                        TableData(tableItems, table, items)
                     } // finally, wrap up the TableData
             }
 

@@ -12,3 +12,5 @@ fun createTables(size: Int) = List(size) {
     val index = it + 1
     Table(id = "T-${index.asTwoDigits()}", name = "Table $index")
 }
+
+fun firstTable() = tables.first()
