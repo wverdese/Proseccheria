@@ -375,8 +375,6 @@ gradle-app.setting
 *.hprof
 
 # Keystore files
-*.jks
-*.keystore
 /credentials/ios/local-keystore.yml
 /credentials/android/local-keystore.yml
 !/credentials/android/dev-keystore.jks

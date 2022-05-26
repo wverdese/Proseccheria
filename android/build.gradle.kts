@@ -4,6 +4,14 @@ plugins {
 }
 
 android {
+    signingConfigs {
+        create("release") {
+            storeFile = file("$rootDir/keystore.jks")
+            storePassword = "wverdese"
+            keyAlias = "wverdese"
+            keyPassword = "wverdese"
+        }
+    }
     compileSdk = 32
     defaultConfig {
         applicationId = "me.wverdese.proseccheria.android"
@@ -13,8 +21,15 @@ android {
         versionName = "1.0"
     }
     buildTypes {
-        getByName("release") {
+        getByName("debug") {
+            applicationIdSuffix = ".debug"
             isMinifyEnabled = false
+            isDebuggable = true
+        }
+        getByName("release") {
+            signingConfig = signingConfigs.getByName("release")
+            isMinifyEnabled = true
+            isDebuggable = false
         }
     }
 
