@@ -419,18 +419,11 @@ obj/
 
 !/gradle/wrapper/gradle-wrapper.jar
 
-# Auth API credentials
-/shared/src/commonMain/kotlin/com/airthings/airthings/shared/network/oauth/Secrets.kt
-
 # End of https://www.toptal.com/developers/gitignore/api/macos,xcode,windows,linux,swift,swiftpackagemanager,kotlin,androidstudio,android,jetbrains+all,gradle
 
 
 
-### Additions for Airthings.
-
-# This file contains the API's authentication keys and is automatically created by the CI.
-# For local use, one must create it and prepare it according to the README:
-# https://github.com/Airthings/airthings-app#configure-the-auth-api-keys
+### Additions.
 /secrets.properties
 /firebase-release-notes.txt
 /firebase-distribution-groups.txt
@@ -438,8 +431,4 @@ obj/
 # Ignore few files when building iOS app.
 /ios/.bundle/
 /ios/vendor/
-/ios/AirthingsApp/App/Config/Overrides.xcconfig
-
-# Ignore generated localization files.
-ios/AirthingsApp/L10n/*
-android/src/main/res/values*/strings.xml
+# /ios/AirthingsApp/App/Config/Overrides.xcconfig
