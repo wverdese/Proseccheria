@@ -7,9 +7,11 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.BackdropScaffold
 import androidx.compose.material.BackdropScaffoldState
@@ -25,18 +27,20 @@ import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Wysiwyg
-import androidx.compose.material.primarySurface
 import androidx.compose.material.rememberBackdropScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
+import me.wverdese.proseccheria.android.R
 import me.wverdese.proseccheria.android.theme.AppTheme
 import me.wverdese.proseccheria.domain.TableData
 import me.wverdese.proseccheria.domain.TableData.Item.FoodItem
@@ -45,6 +49,7 @@ import me.wverdese.proseccheria.model.Food
 import me.wverdese.proseccheria.model.GLASS
 import me.wverdese.proseccheria.model.NotesType
 import me.wverdese.proseccheria.model.Other
+import me.wverdese.proseccheria.model.QuantityType
 import me.wverdese.proseccheria.model.TableId
 import me.wverdese.proseccheria.model.Wine
 import me.wverdese.proseccheria.model.createTables
@@ -115,9 +120,9 @@ fun OrderScreen(
                                 else MaterialTheme.colors.onSurface
                             )
                             Icon(
-                                Icons.Filled.Wysiwyg,
+                                painter = painterResource(R.drawable.ic_wysiwyg),
+                                contentDescription = "View Order",
                                 tint = tint,
-                                contentDescription = "View Order"
                             )
                         }
                         IconButton(onClick = { }) {
@@ -172,25 +177,33 @@ fun OrderScreen(
                                 }
                             }
                             items(count = rows.size) { index ->
-                                Box(
+                                Row(
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .clickable(onClick = {
                                             clickedItemState.value = rows[index]
-                                        })
+                                        }),
+                                    verticalAlignment = Alignment.Top
                                 ) {
-                                    Column(modifier = Modifier.padding(all = 16.dp)) {
+                                    Column(
+                                        modifier = Modifier
+                                            .padding(all = 16.dp)
+                                            .weight(1f)
+                                    ) {
                                         Text(
-                                            modifier = Modifier.padding(start = 8.dp),
                                             text = rows[index].item.name,
                                             style = MaterialTheme.typography.body1,
                                         )
                                         Text(
-                                            modifier = Modifier.padding(start = 8.dp, top = 4.dp),
+                                            modifier = Modifier.padding(top = 4.dp),
                                             text = rows[index].notes ?: "",
                                             style = MaterialTheme.typography.caption,
                                         )
                                     }
+                                    QuantityWidget(
+                                        modifier = Modifier.padding(top = 4.dp),
+                                        quantity = rows[index].quantity,
+                                    )
                                 }
                             }
                         }
@@ -198,6 +211,40 @@ fun OrderScreen(
                 }
             }
         )
+    }
+}
+
+@Composable
+fun QuantityWidget(modifier: Modifier = Modifier, quantity: QuantityType?) {
+        Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
+            IconButton(onClick = { /*TODO*/ }) {
+                Icon(
+                    modifier = Modifier.size(18.dp),
+                    painter = painterResource(R.drawable.ic_remove),
+                    tint = MaterialTheme.colors.onSurface,
+                    contentDescription = "Decrement",
+                )
+            }
+            Text(
+                modifier = Modifier.padding(bottom = 2.dp, end = 2.dp),
+                text = "%2d".format(quantity ?: 0),
+            )
+            IconButton(onClick = { /*TODO*/ }) {
+                Icon(
+                    modifier = Modifier.size(18.dp),
+                    painter = painterResource(R.drawable.ic_add),
+                    tint = MaterialTheme.colors.onSurface,
+                    contentDescription = "Increment",
+                )
+            }
+    }
+}
+
+@Preview
+@Composable
+fun QuantityWidgetPreview() {
+    AppTheme {
+        QuantityWidget(quantity = 99)
     }
 }
 

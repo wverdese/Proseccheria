@@ -47,7 +47,6 @@ dependencies {
     implementation("androidx.activity:activity-compose:${Version.AndroidX.ACTIVITY_COMPOSE}")
     /* Compose */
     implementation("androidx.compose.material:material:${Version.Compose.MATERIAL}")
-    implementation("androidx.compose.material:material-icons-extended:${Version.Compose.MATERIAL}")
     implementation("androidx.compose.ui:ui:${Version.Compose.MAIN}")
     implementation("androidx.compose.ui:ui-tooling:${Version.Compose.MAIN}")
     /* Koin */
