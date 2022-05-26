@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import me.wverdese.proseccheria.domain.TableData
 import me.wverdese.proseccheria.model.NotesType
+import me.wverdese.proseccheria.model.QuantityType
 import me.wverdese.proseccheria.model.TableId
 import me.wverdese.proseccheria.repo.TableDataRepository
 
@@ -37,6 +38,18 @@ class OrderScreenViewModel(
     fun editNotes(item: TableData.Item, notes: NotesType?) {
         viewModelScope.launch {
             tableDataRepo.updateNotes(state.table.id, item, notes)
+        }
+    }
+
+    fun incrementQuantity(item: TableData.Item, quantity: QuantityType) {
+        viewModelScope.launch {
+            tableDataRepo.updateQuantity(state.table.id, item, quantity + 1)
+        }
+    }
+
+    fun decrementQuantity(item: TableData.Item, quantity: QuantityType) {
+        viewModelScope.launch {
+            tableDataRepo.updateQuantity(state.table.id, item, quantity - 1)
         }
     }
 

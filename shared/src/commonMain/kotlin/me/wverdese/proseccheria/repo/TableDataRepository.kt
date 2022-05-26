@@ -18,6 +18,7 @@ import me.wverdese.proseccheria.domain.TableData
 import me.wverdese.proseccheria.model.ItemData
 import me.wverdese.proseccheria.model.Menu
 import me.wverdese.proseccheria.model.NotesType
+import me.wverdese.proseccheria.model.QuantityType
 import me.wverdese.proseccheria.model.Table
 import me.wverdese.proseccheria.model.TableId
 import org.koin.core.component.KoinComponent
@@ -67,6 +68,12 @@ class TableDataRepository(
     suspend fun updateNotes(tableId: TableId, item: TableData.Item, notes: NotesType?) {
         val data = item.asItemData(tableId)
         updateIfNeeded(data, data.copy(notes = notes))
+    }
+
+    suspend fun updateQuantity(tableId: TableId, item: TableData.Item, quantity: QuantityType) {
+        val coercedQuantity = quantity.coerceIn(0, 99)
+        val data = item.asItemData(tableId)
+        updateIfNeeded(data, data.copy(quantity = coercedQuantity))
     }
 
     suspend fun clear(tableId: TableId) {

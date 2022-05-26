@@ -14,26 +14,30 @@ data class TableData(
     val items: List<Item>
 ) {
     sealed interface Item {
+        val hasStoredData: Boolean
         val item: MenuItem
-        val quantity: QuantityType?
+        val quantity: QuantityType
         val notes: NotesType?
 
         data class FoodItem(
+            override val hasStoredData: Boolean,
             override val item: Food,
-            override val quantity: QuantityType?,
+            override val quantity: QuantityType,
             override val notes: NotesType?,
         ): Item
 
         data class WineItem(
+            override val hasStoredData: Boolean,
             override val item: Wine,
-            override val quantity: QuantityType?,
+            override val quantity: QuantityType,
             override val notes: NotesType?,
-            val vessel: VesselType?
+            val vessel: VesselType,
         ): Item
 
         data class OtherItem(
+            override val hasStoredData: Boolean,
             override val item: Other,
-            override val quantity: QuantityType?,
+            override val quantity: QuantityType,
             override val notes: NotesType?,
         ): Item
     }

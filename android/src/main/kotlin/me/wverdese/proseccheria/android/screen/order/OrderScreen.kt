@@ -64,6 +64,8 @@ fun OrderScreen(viewModel: OrderScreenViewModel = getViewModel()) {
         state = viewModel.state,
         onTableSelected = viewModel::selectTable,
         onNotesChanged = viewModel::editNotes,
+        onIncrementQuantity = viewModel::incrementQuantity,
+        onDecrementQuantity = viewModel::decrementQuantity
     )
 }
 
@@ -73,6 +75,8 @@ fun OrderScreen(
     state: OrderScreenState,
     onTableSelected: (TableId) -> Unit,
     onNotesChanged: (item: TableData.Item, NotesType?) -> Unit,
+    onIncrementQuantity: (item: TableData.Item, quantity: QuantityType) -> Unit,
+    onDecrementQuantity: (item: TableData.Item, quantity: QuantityType) -> Unit,
 ) {
     val coroutineScope = rememberCoroutineScope()
     val scaffoldState = rememberBackdropScaffoldState(initialValue = BackdropValue.Concealed)
@@ -212,6 +216,8 @@ fun OrderScreen(
                                     QuantityWidget(
                                         modifier = Modifier.padding(top = 4.dp),
                                         quantity = rows[index].quantity,
+                                        onAddClick = { onIncrementQuantity(rows[index], rows[index].quantity) },
+                                        onRemoveClick = { onDecrementQuantity(rows[index], rows[index].quantity) },
                                     )
                                 }
                             }
@@ -224,9 +230,14 @@ fun OrderScreen(
 }
 
 @Composable
-fun QuantityWidget(modifier: Modifier = Modifier, quantity: QuantityType?) {
+fun QuantityWidget(
+    modifier: Modifier = Modifier,
+    quantity: QuantityType,
+    onAddClick: () -> Unit = {},
+    onRemoveClick: () -> Unit = {},
+) {
     Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
-        IconButton(onClick = { /*TODO*/ }) {
+        IconButton(onClick = { onRemoveClick() }) {
             Icon(
                 modifier = Modifier.size(18.dp),
                 painter = painterResource(R.drawable.ic_remove),
@@ -236,9 +247,9 @@ fun QuantityWidget(modifier: Modifier = Modifier, quantity: QuantityType?) {
         }
         Text(
             modifier = Modifier.padding(bottom = 2.dp, end = 2.dp),
-            text = "%2d".format(quantity ?: 0),
+            text = "%2d".format(quantity),
         )
-        IconButton(onClick = { /*TODO*/ }) {
+        IconButton(onClick = { onAddClick() }) {
             Icon(
                 modifier = Modifier.size(18.dp),
                 painter = painterResource(R.drawable.ic_add),
@@ -274,7 +285,8 @@ fun OrderScreenPreview() {
                                 name = "Tagliere salumi e formaggi"
                             ),
                             quantity = 1,
-                            notes = "test"
+                            notes = "test",
+                            hasStoredData = true
                         ),
                     ),
                     "Prosecchi" to listOf(
@@ -287,7 +299,8 @@ fun OrderScreenPreview() {
                             ),
                             quantity = 2,
                             notes = "test1",
-                            vessel = GLASS
+                            vessel = GLASS,
+                            hasStoredData = true
                         ),
                         TableData.Item.WineItem(
                             item = Wine(
@@ -296,12 +309,13 @@ fun OrderScreenPreview() {
                                 vessel = Wine.Vessel.BOTTLE,
                                 name = "Mont Blanc Cuvee Ex Dry"
                             ),
-                            quantity = null,
+                            quantity = 0,
                             notes = null,
-                            vessel = BOTTLE
+                            vessel = BOTTLE,
+                            hasStoredData = true
                         ),
                     ),
-                    "Alcolici" to listOf(
+                    "Altro" to listOf(
                         TableData.Item.OtherItem(
                             item = Other(
                                 id = "SC-01",
@@ -309,13 +323,26 @@ fun OrderScreenPreview() {
                                 name = "Aperol Spritz"
                             ),
                             quantity = 3,
-                            notes = "test test"
+                            notes = "test test",
+                            hasStoredData = true
+                        ),
+                        TableData.Item.OtherItem(
+                            item = Other(
+                                id = "SC-01",
+                                type = Other.Type.Cafeteria,
+                                name = "Caffè"
+                            ),
+                            quantity = 0,
+                            notes = null,
+                            hasStoredData = false
                         )
                     )
                 )
             ),
             onTableSelected = {},
-            onNotesChanged = { _, _ -> }
+            onNotesChanged = { _, _ -> },
+            onIncrementQuantity = { _, _ -> },
+            onDecrementQuantity = { _, _ -> }
         )
     }
 }
