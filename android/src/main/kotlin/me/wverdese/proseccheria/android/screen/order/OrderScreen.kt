@@ -49,6 +49,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import kotlinx.coroutines.launch
 import me.wverdese.proseccheria.android.R
+import me.wverdese.proseccheria.android.screen.AlphaIcon
 import me.wverdese.proseccheria.android.theme.AppTheme
 import me.wverdese.proseccheria.domain.TableData
 import me.wverdese.proseccheria.domain.TableData.Item.FoodItem
@@ -59,7 +60,6 @@ import me.wverdese.proseccheria.model.NotesType
 import me.wverdese.proseccheria.model.Other
 import me.wverdese.proseccheria.model.QuantityType
 import me.wverdese.proseccheria.model.Table
-import me.wverdese.proseccheria.model.TableId
 import me.wverdese.proseccheria.model.VesselType
 import me.wverdese.proseccheria.model.Wine
 import me.wverdese.proseccheria.model.createTables
@@ -148,15 +148,16 @@ fun OrderScreen(
                             Icon(
                                 painter = painterResource(R.drawable.ic_wysiwyg),
                                 contentDescription = "View Order",
-                                tint = tint,
+                                tint = tint
                             )
                         }
-                        IconButton(onClick = { deleteTableState.value = table }) {
-                            Icon(
-                                Icons.Filled.Delete,
-                                tint = MaterialTheme.colors.onSurface,
-                                contentDescription = "Clear Table"
-                            )
+                        IconButton(onClick = { deleteTableState.value = table }, enabled = isClearTableButtonEnabled) {
+                            AlphaIcon(enabled = isClearTableButtonEnabled) {
+                                Icon(
+                                    Icons.Filled.Delete,
+                                    contentDescription = "Clear Table"
+                                )
+                            }
                         }
                     },
                 )
@@ -298,7 +299,7 @@ fun VesselWidget(
         enabled = canChangeVessel,
         onClick = { onVesselClick() }
     ) {
-        CompositionLocalProvider(LocalContentAlpha provides if (canChangeVessel) ContentAlpha.high else ContentAlpha.disabled) {
+        AlphaIcon(enabled = canChangeVessel) {
             Icon(
                 modifier = Modifier.size(if (vessel == GLASS) 24.dp else 32.dp),
                 painter = painterResource(if (vessel == GLASS) R.drawable.ic_glass else R.drawable.ic_bottle),
@@ -380,6 +381,8 @@ fun OrderScreenPreview() {
             state = OrderScreenState(
                 tables = createTables(16),
                 table = tables.first(),
+                isClearTableButtonEnabled = false,
+                isViewOrderButtonEnabled = true,
                 groupedItems = mapOf(
                     "Antipasti" to listOf(
                         FoodItem(

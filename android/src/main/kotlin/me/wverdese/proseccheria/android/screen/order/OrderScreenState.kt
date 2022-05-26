@@ -6,5 +6,7 @@ import me.wverdese.proseccheria.model.Table
 data class OrderScreenState(
     val tables: List<Table>,
     val table: Table,
+    val isClearTableButtonEnabled: Boolean,
+    val isViewOrderButtonEnabled: Boolean,
     val groupedItems: Map<String, List<TableData.Item>>,
 )

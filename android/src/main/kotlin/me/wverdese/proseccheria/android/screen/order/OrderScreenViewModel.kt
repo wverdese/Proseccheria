@@ -8,9 +8,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import me.wverdese.proseccheria.domain.TableData
 import me.wverdese.proseccheria.model.NotesType
-import me.wverdese.proseccheria.model.QuantityType
 import me.wverdese.proseccheria.model.Table
-import me.wverdese.proseccheria.model.TableId
 import me.wverdese.proseccheria.repo.TableDataRepository
 
 class OrderScreenViewModel(
@@ -24,6 +22,8 @@ class OrderScreenViewModel(
             tableDataRepo.observeTableData.collect { data ->
                 state = state.copy(
                     table = data.table,
+                    isClearTableButtonEnabled = data.hasStoredData,
+                    isViewOrderButtonEnabled = data.hasOrders,
                     groupedItems = data.items
                         .groupBy { it.item.type.name }
                         .mapValues { (_, list) -> list.sortedBy { it.item.name } }
@@ -69,6 +69,8 @@ class OrderScreenViewModel(
     private fun initScreenState() = OrderScreenState(
         tables = tableDataRepo.tables,
         table = tableDataRepo.tables.first(),
+        isClearTableButtonEnabled = false,
+        isViewOrderButtonEnabled = false,
         groupedItems = emptyMap(),
     )
 }

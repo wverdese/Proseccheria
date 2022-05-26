@@ -13,11 +13,16 @@ data class TableData(
     val table: Table,
     val items: List<Item>
 ) {
+    val hasOrders: Boolean = items.find { it.hasOrder } != null
+    val hasStoredData: Boolean = items.find { it.hasStoredData } != null
+
     sealed interface Item {
         val hasStoredData: Boolean
         val item: MenuItem
         val quantity: QuantityType
         val notes: NotesType?
+
+        val hasOrder: Boolean get() = quantity > 0
 
         data class FoodItem(
             override val hasStoredData: Boolean,
