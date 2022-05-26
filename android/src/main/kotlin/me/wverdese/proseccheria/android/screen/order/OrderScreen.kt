@@ -8,10 +8,12 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.BackdropScaffold
 import androidx.compose.material.BackdropScaffoldState
@@ -41,6 +43,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
 import me.wverdese.proseccheria.android.R
 import me.wverdese.proseccheria.android.theme.AppTheme
@@ -53,6 +56,7 @@ import me.wverdese.proseccheria.model.NotesType
 import me.wverdese.proseccheria.model.Other
 import me.wverdese.proseccheria.model.QuantityType
 import me.wverdese.proseccheria.model.TableId
+import me.wverdese.proseccheria.model.VesselType
 import me.wverdese.proseccheria.model.Wine
 import me.wverdese.proseccheria.model.createTables
 import me.wverdese.proseccheria.model.tables
@@ -65,7 +69,8 @@ fun OrderScreen(viewModel: OrderScreenViewModel = getViewModel()) {
         onTableSelected = viewModel::selectTable,
         onNotesChanged = viewModel::editNotes,
         onIncrementQuantity = viewModel::incrementQuantity,
-        onDecrementQuantity = viewModel::decrementQuantity
+        onDecrementQuantity = viewModel::decrementQuantity,
+        onVesselChange = viewModel::changeVessel,
     )
 }
 
@@ -75,8 +80,9 @@ fun OrderScreen(
     state: OrderScreenState,
     onTableSelected: (TableId) -> Unit,
     onNotesChanged: (item: TableData.Item, NotesType?) -> Unit,
-    onIncrementQuantity: (item: TableData.Item, quantity: QuantityType) -> Unit,
-    onDecrementQuantity: (item: TableData.Item, quantity: QuantityType) -> Unit,
+    onIncrementQuantity: (item: TableData.Item) -> Unit,
+    onDecrementQuantity: (item: TableData.Item) -> Unit,
+    onVesselChange: (item: TableData.Item.WineItem) -> Unit,
 ) {
     val coroutineScope = rememberCoroutineScope()
     val scaffoldState = rememberBackdropScaffoldState(initialValue = BackdropValue.Concealed)
@@ -186,13 +192,12 @@ fun OrderScreen(
                                 count = rows.size,
                                 key = { index -> rows[index].item.id },
                             ) { index ->
+                                val row = rows[index]
                                 Row(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .clickable(onClick = {
-                                            clickedItemState.value = rows[index]
-                                        }),
-                                    verticalAlignment = Alignment.Top
+                                        .clickable(onClick = { clickedItemState.value = row }),
+                                    verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     Column(
                                         modifier = Modifier
@@ -200,10 +205,10 @@ fun OrderScreen(
                                             .weight(1f)
                                     ) {
                                         Text(
-                                            text = rows[index].item.name,
+                                            text = row.item.name,
                                             style = MaterialTheme.typography.body1,
                                         )
-                                        rows[index].notes?.let {
+                                        row.notes?.let {
                                             CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
                                                 Text(
                                                     modifier = Modifier.padding(top = 4.dp),
@@ -213,11 +218,19 @@ fun OrderScreen(
                                             }
                                         }
                                     }
+                                    if (row is TableData.Item.WineItem) {
+                                        VesselWidget(
+                                            canChangeVessel = row.canChangeVessel,
+                                            vessel = row.vessel,
+                                            onVesselClick = { onVesselChange(row) }
+                                        )
+                                        Spacer(modifier = Modifier.width(8.dp))
+                                    }
                                     QuantityWidget(
                                         modifier = Modifier.padding(top = 4.dp),
-                                        quantity = rows[index].quantity,
-                                        onAddClick = { onIncrementQuantity(rows[index], rows[index].quantity) },
-                                        onRemoveClick = { onDecrementQuantity(rows[index], rows[index].quantity) },
+                                        quantity = row.quantity,
+                                        onAddClick = { onIncrementQuantity(row) },
+                                        onRemoveClick = { onDecrementQuantity(row) },
                                     )
                                 }
                             }
@@ -237,25 +250,59 @@ fun QuantityWidget(
     onRemoveClick: () -> Unit = {},
 ) {
     Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
-        IconButton(onClick = { onRemoveClick() }) {
+        IconButton(modifier = Modifier.size(36.dp), onClick = { onRemoveClick() }) {
             Icon(
-                modifier = Modifier.size(18.dp),
+                modifier = Modifier.size(24.dp),
                 painter = painterResource(R.drawable.ic_remove),
-                tint = MaterialTheme.colors.onSurface,
                 contentDescription = "Decrement",
             )
         }
         Text(
             modifier = Modifier.padding(bottom = 2.dp, end = 2.dp),
             text = "%2d".format(quantity),
+            fontSize = 18.sp,
         )
-        IconButton(onClick = { onAddClick() }) {
+        IconButton(modifier = Modifier.size(36.dp), onClick = { onAddClick() }) {
             Icon(
-                modifier = Modifier.size(18.dp),
+                modifier = Modifier.size(24.dp),
                 painter = painterResource(R.drawable.ic_add),
-                tint = MaterialTheme.colors.onSurface,
                 contentDescription = "Increment",
             )
+        }
+    }
+}
+
+@Composable
+fun VesselWidget(
+    modifier: Modifier = Modifier,
+    canChangeVessel: Boolean,
+    vessel: VesselType,
+    onVesselClick: () -> Unit = {},
+) {
+    IconButton(
+        modifier = modifier.size(36.dp),
+        enabled = canChangeVessel,
+        onClick = { onVesselClick() }
+    ) {
+        CompositionLocalProvider(LocalContentAlpha provides if (canChangeVessel) ContentAlpha.high else ContentAlpha.disabled) {
+            Icon(
+                modifier = Modifier.size(if (vessel == GLASS) 24.dp else 32.dp),
+                painter = painterResource(if (vessel == GLASS) R.drawable.ic_glass else R.drawable.ic_bottle),
+                contentDescription = if (vessel == GLASS) "Glass" else "Bottle",
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+fun VesselWidgetPreview() {
+    AppTheme {
+        Column {
+            VesselWidget(canChangeVessel = true, vessel = GLASS)
+            VesselWidget(canChangeVessel = true, vessel = BOTTLE)
+            VesselWidget(canChangeVessel = false, vessel = GLASS)
+            VesselWidget(canChangeVessel = false, vessel = BOTTLE)
         }
     }
 }
@@ -341,8 +388,9 @@ fun OrderScreenPreview() {
             ),
             onTableSelected = {},
             onNotesChanged = { _, _ -> },
-            onIncrementQuantity = { _, _ -> },
-            onDecrementQuantity = { _, _ -> }
+            onIncrementQuantity = {},
+            onDecrementQuantity = {},
+            onVesselChange = {}
         )
     }
 }

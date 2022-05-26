@@ -1,5 +1,3 @@
-
-
 package me.wverdese.proseccheria.repo
 
 import com.russhwolf.settings.ExperimentalSettingsApi
@@ -15,6 +13,8 @@ import kotlinx.coroutines.flow.update
 import me.wverdese.proseccheria.converter.asItem
 import me.wverdese.proseccheria.converter.asItemData
 import me.wverdese.proseccheria.domain.TableData
+import me.wverdese.proseccheria.model.BOTTLE
+import me.wverdese.proseccheria.model.GLASS
 import me.wverdese.proseccheria.model.ItemData
 import me.wverdese.proseccheria.model.Menu
 import me.wverdese.proseccheria.model.NotesType
@@ -70,10 +70,27 @@ class TableDataRepository(
         updateIfNeeded(data, data.copy(notes = notes))
     }
 
-    suspend fun updateQuantity(tableId: TableId, item: TableData.Item, quantity: QuantityType) {
-        val coercedQuantity = quantity.coerceIn(0, 99)
+    suspend fun incrementQuantity(tableId: TableId, item: TableData.Item) =
+        updateQuantity(tableId, item) { plus(1) }
+
+    suspend fun decrementQuantity(tableId: TableId, item: TableData.Item) =
+        updateQuantity(tableId, item) { minus(1) }
+
+    private suspend fun updateQuantity(
+        tableId: TableId,
+        item: TableData.Item,
+        update: QuantityType.() -> QuantityType
+    ) {
+        val coercedQuantity = item.quantity.update().coerceIn(0, 9)
         val data = item.asItemData(tableId)
         updateIfNeeded(data, data.copy(quantity = coercedQuantity))
+    }
+
+    suspend fun changeVessel(tableId: TableId, wineItem: TableData.Item.WineItem) {
+        if (wineItem.canChangeVessel) {
+            val data = wineItem.asItemData(tableId)
+            updateIfNeeded(data, data.copy(vessel = if (wineItem.vessel == GLASS) BOTTLE else GLASS))
+        }
     }
 
     suspend fun clear(tableId: TableId) {

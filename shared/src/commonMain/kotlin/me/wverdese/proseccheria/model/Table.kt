@@ -6,7 +6,7 @@ typealias TableId = String
 
 data class Table(val id: TableId, val name: String)
 
-val tables = createTables(16)
+val tables = createTables(23)
 
 fun createTables(size: Int) = List(size) {
     val index = it + 1

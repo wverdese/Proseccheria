@@ -32,7 +32,9 @@ data class TableData(
             override val quantity: QuantityType,
             override val notes: NotesType?,
             val vessel: VesselType,
-        ): Item
+        ): Item {
+            val canChangeVessel: Boolean = item.vessel == Wine.Vessel.BOTH
+        }
 
         data class OtherItem(
             override val hasStoredData: Boolean,

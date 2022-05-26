@@ -41,15 +41,21 @@ class OrderScreenViewModel(
         }
     }
 
-    fun incrementQuantity(item: TableData.Item, quantity: QuantityType) {
+    fun incrementQuantity(item: TableData.Item) {
         viewModelScope.launch {
-            tableDataRepo.updateQuantity(state.table.id, item, quantity + 1)
+            tableDataRepo.incrementQuantity(state.table.id, item)
         }
     }
 
-    fun decrementQuantity(item: TableData.Item, quantity: QuantityType) {
+    fun decrementQuantity(item: TableData.Item) {
         viewModelScope.launch {
-            tableDataRepo.updateQuantity(state.table.id, item, quantity - 1)
+            tableDataRepo.decrementQuantity(state.table.id, item)
+        }
+    }
+
+    fun changeVessel(item: TableData.Item.WineItem) {
+        viewModelScope.launch {
+            tableDataRepo.changeVessel(state.table.id, item)
         }
     }
 
