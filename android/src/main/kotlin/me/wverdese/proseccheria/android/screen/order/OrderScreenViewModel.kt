@@ -5,7 +5,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import javax.microedition.khronos.opengles.GL
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
@@ -35,9 +34,7 @@ class OrderScreenViewModel(
                         isClearTableButtonEnabled = data.hasOrders,
                         mode = if (mode == Mode.EDIT)
                             OrderScreenState.Mode.Edit(
-                                groupedItems = data.items
-                                    .groupBy { it.item.type.name }
-                                    .mapValues { (_, list) -> list.sortedBy { it.item.name } }
+                                groupedItems = data.items.groupBy { it.item.type.name }
                             )
                         else
                             OrderScreenState.Mode.View(

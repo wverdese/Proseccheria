@@ -34,6 +34,8 @@ class TableDataRepository(
     private val _selectedTable = MutableStateFlow(tables.first())
     val selectedTable: StateFlow<Table> = _selectedTable
 
+    private val itemComparator = compareBy<TableData.Item> { it.item.type.ordinal }.thenBy { it.item.name }
+
     val observeTableData: Flow<TableData> =
         // update when a table is selected
         selectedTable
@@ -50,8 +52,8 @@ class TableDataRepository(
                             } // parse stored json into a TableData.Item
                     }
                 ) {
-                    it.toList()
-                } // put all the TableData.Items in a list
+                    it.sortedWith(itemComparator)
+                } // put all the TableData.Items in a sorted list
                     .map { items ->
                         TableData(table, items)
                     } // finally, wrap up the TableData
