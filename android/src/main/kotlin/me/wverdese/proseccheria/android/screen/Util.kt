@@ -11,3 +11,10 @@ fun AlphaIcon(enabled: Boolean, content: @Composable () -> Unit) {
         content()
     }
 }
+
+@Composable
+fun AlphaMedium(content: @Composable () -> Unit) {
+    CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+        content()
+    }
+}

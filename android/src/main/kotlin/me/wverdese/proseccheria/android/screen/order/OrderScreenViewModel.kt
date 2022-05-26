@@ -5,10 +5,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import javax.microedition.khronos.opengles.GL
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import me.wverdese.proseccheria.domain.TableData
+import me.wverdese.proseccheria.model.GLASS
 import me.wverdese.proseccheria.model.NotesType
 import me.wverdese.proseccheria.model.Table
+import me.wverdese.proseccheria.model.VesselType
 import me.wverdese.proseccheria.repo.TableDataRepository
 
 class OrderScreenViewModel(
@@ -17,17 +22,37 @@ class OrderScreenViewModel(
     var state: OrderScreenState by mutableStateOf(initScreenState())
         private set
 
+    private val mode = MutableStateFlow(Mode.EDIT)
+
     init {
         viewModelScope.launch {
-            tableDataRepo.observeTableData.collect { data ->
-                state = state.copy(
-                    table = data.table,
-                    isClearTableButtonEnabled = data.hasOrders,
-                    groupedItems = data.items
-                        .groupBy { it.item.type.name }
-                        .mapValues { (_, list) -> list.sortedBy { it.item.name } }
-                )
-            }
+            tableDataRepo
+                .observeTableData
+                .combine(mode) { data, mode -> data to mode }
+                .collect { (data, mode) ->
+                    state = state.copy(
+                        table = data.table,
+                        isClearTableButtonEnabled = data.hasOrders,
+                        mode = if (mode == Mode.EDIT)
+                            OrderScreenState.Mode.Edit(
+                                groupedItems = data.items
+                                    .groupBy { it.item.type.name }
+                                    .mapValues { (_, list) -> list.sortedBy { it.item.name } }
+                            )
+                        else
+                            OrderScreenState.Mode.View(
+                                orders = data.items
+                                    .filter { it.hasOrder }
+                                    .map { item ->
+                                        var text = "${item.quantity}x ${item.item.name}"
+                                        if (item is TableData.Item.WineItem) {
+                                            text += " (${item.vessel.asVesselString()})"
+                                        }
+                                        Order(id = item.item.id, text, item.notes)
+                                    }
+                            )
+                    )
+                }
         }
     }
 
@@ -65,10 +90,20 @@ class OrderScreenViewModel(
         }
     }
 
+    fun toggleMode() {
+        mode.value = if (mode.value == Mode.EDIT) Mode.VIEW else Mode.EDIT
+    }
+
     private fun initScreenState() = OrderScreenState(
         tables = tableDataRepo.tables,
         table = tableDataRepo.tables.first(),
         isClearTableButtonEnabled = false,
-        groupedItems = emptyMap(),
+        mode = OrderScreenState.Mode.Edit(groupedItems = emptyMap())
     )
+}
+
+private fun VesselType.asVesselString() = if (this == GLASS) "glass" else "bottle"
+
+private enum class Mode {
+    EDIT, VIEW
 }

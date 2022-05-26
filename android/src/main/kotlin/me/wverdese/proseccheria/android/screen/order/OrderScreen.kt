@@ -19,12 +19,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.BackdropScaffold
 import androidx.compose.material.BackdropScaffoldState
 import androidx.compose.material.BackdropValue
-import androidx.compose.material.ContentAlpha
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.IconToggleButton
-import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
@@ -35,7 +33,6 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.rememberBackdropScaffoldState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -50,6 +47,7 @@ import androidx.compose.ui.window.Dialog
 import kotlinx.coroutines.launch
 import me.wverdese.proseccheria.android.R
 import me.wverdese.proseccheria.android.screen.AlphaIcon
+import me.wverdese.proseccheria.android.screen.AlphaMedium
 import me.wverdese.proseccheria.android.theme.AppTheme
 import me.wverdese.proseccheria.domain.TableData
 import me.wverdese.proseccheria.domain.TableData.Item.FoodItem
@@ -70,6 +68,7 @@ import org.koin.androidx.compose.getViewModel
 fun OrderScreen(viewModel: OrderScreenViewModel = getViewModel()) {
     OrderScreen(
         state = viewModel.state,
+        onToggleMode = viewModel::toggleMode,
         onSelectTable = viewModel::selectTable,
         onClearTable = viewModel::clearTable,
         onEditNotes = viewModel::editNotes,
@@ -83,7 +82,8 @@ fun OrderScreen(viewModel: OrderScreenViewModel = getViewModel()) {
 @Composable
 fun OrderScreen(
     state: OrderScreenState,
-    onSelectTable: (Table) -> Unit,
+    onToggleMode: () -> Unit,
+    onSelectTable: (table: Table) -> Unit,
     onClearTable: (table: Table) -> Unit,
     onEditNotes: (item: TableData.Item, NotesType?) -> Unit,
     onIncrementQuantity: (item: TableData.Item) -> Unit,
@@ -92,7 +92,6 @@ fun OrderScreen(
 ) {
     val coroutineScope = rememberCoroutineScope()
     val scaffoldState = rememberBackdropScaffoldState(initialValue = BackdropValue.Concealed)
-    val viewOrder = remember { mutableStateOf(false) }
     val clickedItemState = remember { mutableStateOf<TableData.Item?>(null) }
     val deleteTableState = remember { mutableStateOf<Table?>(null) }
 
@@ -137,12 +136,13 @@ fun OrderScreen(
                         Text(text = table.name)
                     },
                     actions = {
+                        val isChecked = mode is OrderScreenState.Mode.View
                         IconToggleButton(
-                            checked = viewOrder.value,
-                            onCheckedChange = { viewOrder.value = it }
+                            checked = isChecked,
+                            onCheckedChange = { onToggleMode() }
                         ) {
                             val tint by animateColorAsState(
-                                if (viewOrder.value) MaterialTheme.colors.primary
+                                if (isChecked) MaterialTheme.colors.primary
                                 else MaterialTheme.colors.onSurface
                             )
                             Icon(
@@ -189,64 +189,107 @@ fun OrderScreen(
             frontLayerContent = {
                 Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.background) {
                     LazyColumn {
-                        groupedItems.forEach { (section, rows) ->
-                            stickyHeader {
-                                Surface(
-                                    modifier = Modifier
-                                        .fillMaxWidth(),
-                                    color = MaterialTheme.colors.background,
-                                ) {
-                                    Text(
-                                        modifier = Modifier.padding(16.dp),
-                                        text = section,
-                                        style = MaterialTheme.typography.h6,
-                                    )
+                        when (mode) {
+                            is OrderScreenState.Mode.Edit -> {
+                                mode.groupedItems.forEach { (section, rows) ->
+                                    stickyHeader {
+                                        Surface(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            color = MaterialTheme.colors.background,
+                                        ) {
+                                            Text(
+                                                modifier = Modifier.padding(16.dp),
+                                                text = section,
+                                                style = MaterialTheme.typography.h6,
+                                            )
+                                        }
+                                    }
+                                    items(
+                                        count = rows.size,
+                                        key = { index -> rows[index].item.id },
+                                    ) { index ->
+                                        val row = rows[index]
+                                        Row(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .clickable(onClick = { clickedItemState.value = row }),
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Column(
+                                                modifier = Modifier
+                                                    .padding(all = 16.dp)
+                                                    .weight(1f)
+                                            ) {
+                                                Text(
+                                                    text = row.item.name,
+                                                    style = MaterialTheme.typography.body1,
+                                                )
+                                                row.notes?.let {
+                                                    AlphaMedium {
+                                                        Text(
+                                                            modifier = Modifier.padding(top = 4.dp),
+                                                            text = it,
+                                                            style = MaterialTheme.typography.body2,
+                                                        )
+                                                    }
+                                                }
+                                            }
+                                            if (row is TableData.Item.WineItem) {
+                                                VesselWidget(
+                                                    canChangeVessel = row.canChangeVessel,
+                                                    vessel = row.vessel,
+                                                    onVesselClick = { onChangeVessel(row) }
+                                                )
+                                                Spacer(modifier = Modifier.width(8.dp))
+                                            }
+                                            QuantityWidget(
+                                                modifier = Modifier.padding(top = 4.dp),
+                                                quantity = row.quantity,
+                                                onAddClick = { onIncrementQuantity(row) },
+                                                onRemoveClick = { onDecrementQuantity(row) },
+                                            )
+                                        }
+                                    }
                                 }
                             }
-                            items(
-                                count = rows.size,
-                                key = { index -> rows[index].item.id },
-                            ) { index ->
-                                val row = rows[index]
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .clickable(onClick = { clickedItemState.value = row }),
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Column(
-                                        modifier = Modifier
-                                            .padding(all = 16.dp)
-                                            .weight(1f)
-                                    ) {
+                            is OrderScreenState.Mode.View -> {
+                                items(
+                                    count = mode.orders.size + 1,
+                                    key = { index -> if (index == 0) "$$" else mode.orders[index - 1].id },
+                                ) { index ->
+                                    if (index == 0) {
                                         Text(
-                                            text = row.item.name,
-                                            style = MaterialTheme.typography.body1,
+                                            modifier = Modifier.padding(16.dp),
+                                            text = "Order details",
+                                            style = MaterialTheme.typography.h6,
                                         )
-                                        row.notes?.let {
-                                            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+                                    } else {
+                                        val order = mode.orders[index - 1]
+                                        Row(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Column(
+                                                modifier = Modifier
+                                                    .padding(all = 16.dp)
+                                                    .weight(1f)
+                                            ) {
                                                 Text(
-                                                    modifier = Modifier.padding(top = 4.dp),
-                                                    text = it,
-                                                    style = MaterialTheme.typography.body2,
+                                                    text = order.text,
+                                                    style = MaterialTheme.typography.body1,
                                                 )
+                                                order.notes?.let {
+                                                    AlphaMedium {
+                                                        Text(
+                                                            modifier = Modifier.padding(top = 4.dp),
+                                                            text = it,
+                                                            style = MaterialTheme.typography.body2,
+                                                        )
+                                                    }
+                                                }
                                             }
                                         }
                                     }
-                                    if (row is TableData.Item.WineItem) {
-                                        VesselWidget(
-                                            canChangeVessel = row.canChangeVessel,
-                                            vessel = row.vessel,
-                                            onVesselClick = { onChangeVessel(row) }
-                                        )
-                                        Spacer(modifier = Modifier.width(8.dp))
-                                    }
-                                    QuantityWidget(
-                                        modifier = Modifier.padding(top = 4.dp),
-                                        quantity = row.quantity,
-                                        onAddClick = { onIncrementQuantity(row) },
-                                        onRemoveClick = { onDecrementQuantity(row) },
-                                    )
                                 }
                             }
                         }
@@ -274,7 +317,7 @@ fun QuantityWidget(
         }
         Text(
             modifier = Modifier.padding(bottom = 2.dp, end = 2.dp),
-            text = "%2d".format(quantity),
+            text = quantity.toString(),
             fontSize = 18.sp,
         )
         IconButton(modifier = Modifier.size(36.dp), onClick = { onAddClick() }) {
@@ -375,72 +418,102 @@ fun QuantityWidgetPreview() {
 
 @Preview
 @Composable
-fun OrderScreenPreview() {
+fun OrderScreenEditPreview() {
     AppTheme {
         OrderScreen(
             state = OrderScreenState(
                 tables = createTables(16),
                 table = tables.first(),
                 isClearTableButtonEnabled = true,
-                groupedItems = mapOf(
-                    "Antipasti" to listOf(
-                        FoodItem(
-                            item = Food(
-                                id = "FA-01",
-                                type = Food.Type.Antipasto,
-                                name = "Tagliere salumi e formaggi"
+                mode = OrderScreenState.Mode.Edit(
+                    groupedItems = mapOf(
+                        "Antipasti" to listOf(
+                            FoodItem(
+                                item = Food(
+                                    id = "FA-01",
+                                    type = Food.Type.Antipasto,
+                                    name = "Tagliere salumi e formaggi"
+                                ),
+                                quantity = 1,
+                                notes = "test",
                             ),
-                            quantity = 1,
-                            notes = "test",
                         ),
-                    ),
-                    "Prosecchi" to listOf(
-                        TableData.Item.WineItem(
-                            item = Wine(
-                                id = "WP-01",
-                                type = Wine.Type.Prosecco,
-                                vessel = Wine.Vessel.BOTH,
-                                name = "Valdobbiadene Ex Dry"
+                        "Prosecchi" to listOf(
+                            TableData.Item.WineItem(
+                                item = Wine(
+                                    id = "WP-01",
+                                    type = Wine.Type.Prosecco,
+                                    vessel = Wine.Vessel.BOTH,
+                                    name = "Valdobbiadene Ex Dry"
+                                ),
+                                quantity = 2,
+                                notes = "test1",
+                                vessel = GLASS,
                             ),
-                            quantity = 2,
-                            notes = "test1",
-                            vessel = GLASS,
+                            TableData.Item.WineItem(
+                                item = Wine(
+                                    id = "WP-04",
+                                    type = Wine.Type.Prosecco,
+                                    vessel = Wine.Vessel.BOTTLE,
+                                    name = "Mont Blanc Cuvee Ex Dry"
+                                ),
+                                quantity = 0,
+                                notes = null,
+                                vessel = BOTTLE,
+                            ),
                         ),
-                        TableData.Item.WineItem(
-                            item = Wine(
-                                id = "WP-04",
-                                type = Wine.Type.Prosecco,
-                                vessel = Wine.Vessel.BOTTLE,
-                                name = "Mont Blanc Cuvee Ex Dry"
+                        "Altro" to listOf(
+                            TableData.Item.OtherItem(
+                                item = Other(
+                                    id = "SC-01",
+                                    type = Other.Type.Spirit,
+                                    name = "Aperol Spritz"
+                                ),
+                                quantity = 3,
+                                notes = "test test",
                             ),
-                            quantity = 0,
-                            notes = null,
-                            vessel = BOTTLE,
-                        ),
-                    ),
-                    "Altro" to listOf(
-                        TableData.Item.OtherItem(
-                            item = Other(
-                                id = "SC-01",
-                                type = Other.Type.Spirit,
-                                name = "Aperol Spritz"
-                            ),
-                            quantity = 3,
-                            notes = "test test",
-                        ),
-                        TableData.Item.OtherItem(
-                            item = Other(
-                                id = "SC-01",
-                                type = Other.Type.Cafeteria,
-                                name = "Caffè"
-                            ),
-                            quantity = 0,
-                            notes = null,
+                            TableData.Item.OtherItem(
+                                item = Other(
+                                    id = "SC-01",
+                                    type = Other.Type.Cafeteria,
+                                    name = "Caffè"
+                                ),
+                                quantity = 0,
+                                notes = null,
+                            )
                         )
                     )
-                )
+                ),
             ),
             onSelectTable = {},
+            onToggleMode = {},
+            onClearTable = {},
+            onEditNotes = { _, _ -> },
+            onIncrementQuantity = {},
+            onDecrementQuantity = {},
+            onChangeVessel = {},
+        )
+    }
+}
+
+@Preview
+@Composable
+fun OrderScreenViewPreview() {
+    AppTheme {
+        OrderScreen(
+            state = OrderScreenState(
+                tables = createTables(16),
+                table = tables.first(),
+                isClearTableButtonEnabled = true,
+                mode = OrderScreenState.Mode.View(
+                    orders = listOf(
+                        Order("WP-01", "Mont Blanc Cuvee Ex Dry (glass)", "notes"),
+                        Order("SC-01", "Aperol Spritz", null),
+                    )
+                ),
+            ),
+            onSelectTable = {},
+            onToggleMode = {},
             onClearTable = {},
             onEditNotes = { _, _ -> },
             onIncrementQuantity = {},
