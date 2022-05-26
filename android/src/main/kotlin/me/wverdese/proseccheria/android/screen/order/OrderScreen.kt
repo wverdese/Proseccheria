@@ -16,10 +16,12 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.BackdropScaffold
 import androidx.compose.material.BackdropScaffoldState
 import androidx.compose.material.BackdropValue
+import androidx.compose.material.ContentAlpha
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.IconToggleButton
+import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
@@ -29,6 +31,7 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.rememberBackdropScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -197,11 +200,13 @@ fun OrderScreen(
                                             style = MaterialTheme.typography.body1,
                                         )
                                         rows[index].notes?.let {
-                                            Text(
-                                                modifier = Modifier.padding(top = 4.dp),
-                                                text = it,
-                                                style = MaterialTheme.typography.caption,
-                                            )
+                                            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+                                                Text(
+                                                    modifier = Modifier.padding(top = 4.dp),
+                                                    text = it,
+                                                    style = MaterialTheme.typography.body2,
+                                                )
+                                            }
                                         }
                                     }
                                     QuantityWidget(
