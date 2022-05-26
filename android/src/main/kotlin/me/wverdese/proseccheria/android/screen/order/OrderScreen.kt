@@ -38,7 +38,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
 import me.wverdese.proseccheria.android.R
 import me.wverdese.proseccheria.android.theme.AppTheme
@@ -176,7 +175,10 @@ fun OrderScreen(
                                     )
                                 }
                             }
-                            items(count = rows.size) { index ->
+                            items(
+                                count = rows.size,
+                                key = { index -> rows[index].item.id },
+                            ) { index ->
                                 Row(
                                     modifier = Modifier
                                         .fillMaxWidth()
@@ -194,11 +196,13 @@ fun OrderScreen(
                                             text = rows[index].item.name,
                                             style = MaterialTheme.typography.body1,
                                         )
-                                        Text(
-                                            modifier = Modifier.padding(top = 4.dp),
-                                            text = rows[index].notes ?: "",
-                                            style = MaterialTheme.typography.caption,
-                                        )
+                                        rows[index].notes?.let {
+                                            Text(
+                                                modifier = Modifier.padding(top = 4.dp),
+                                                text = it,
+                                                style = MaterialTheme.typography.caption,
+                                            )
+                                        }
                                     }
                                     QuantityWidget(
                                         modifier = Modifier.padding(top = 4.dp),
@@ -216,27 +220,27 @@ fun OrderScreen(
 
 @Composable
 fun QuantityWidget(modifier: Modifier = Modifier, quantity: QuantityType?) {
-        Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
-            IconButton(onClick = { /*TODO*/ }) {
-                Icon(
-                    modifier = Modifier.size(18.dp),
-                    painter = painterResource(R.drawable.ic_remove),
-                    tint = MaterialTheme.colors.onSurface,
-                    contentDescription = "Decrement",
-                )
-            }
-            Text(
-                modifier = Modifier.padding(bottom = 2.dp, end = 2.dp),
-                text = "%2d".format(quantity ?: 0),
+    Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
+        IconButton(onClick = { /*TODO*/ }) {
+            Icon(
+                modifier = Modifier.size(18.dp),
+                painter = painterResource(R.drawable.ic_remove),
+                tint = MaterialTheme.colors.onSurface,
+                contentDescription = "Decrement",
             )
-            IconButton(onClick = { /*TODO*/ }) {
-                Icon(
-                    modifier = Modifier.size(18.dp),
-                    painter = painterResource(R.drawable.ic_add),
-                    tint = MaterialTheme.colors.onSurface,
-                    contentDescription = "Increment",
-                )
-            }
+        }
+        Text(
+            modifier = Modifier.padding(bottom = 2.dp, end = 2.dp),
+            text = "%2d".format(quantity ?: 0),
+        )
+        IconButton(onClick = { /*TODO*/ }) {
+            Icon(
+                modifier = Modifier.size(18.dp),
+                painter = painterResource(R.drawable.ic_add),
+                tint = MaterialTheme.colors.onSurface,
+                contentDescription = "Increment",
+            )
+        }
     }
 }
 

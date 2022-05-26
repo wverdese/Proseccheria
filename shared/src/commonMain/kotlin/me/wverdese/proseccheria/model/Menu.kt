@@ -11,7 +11,7 @@ val menu: Menu = listOf(
     Food(id = "FA-05", type = Food.Type.Antipasto, name = "Impepata di cozze"),
     /* Secondi */
     Food(id = "FS-01", type = Food.Type.Secondo, name = "Carrè di agnello al forno"),
-    Food(id = "FS-01", type = Food.Type.Secondo, name = "Pistacchio con salmone"),
+    Food(id = "FS-02", type = Food.Type.Secondo, name = "Pistacchio con salmone"),
     /* Primi */
     Food(id = "FP-01", type = Food.Type.Primo, name = "Linguine carbonara"),
     Food(id = "FP-02", type = Food.Type.Primo, name = "Ravioli porcini"),
