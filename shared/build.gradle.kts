@@ -27,7 +27,7 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 /* JSON */
-                implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.3")
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2")
                 /* Koin */
                 implementation("io.insert-koin:koin-core:3.2.0")
                 /* KotlinX */
