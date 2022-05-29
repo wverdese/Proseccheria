@@ -33,6 +33,35 @@
           ]
         }
       }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:291282445073:android:fbb42542c1e55d281ce2b0",
+        "android_client_info": {
+          "package_name": "me.wverdese.proseccheria.android.debug"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "291282445073-h52mmo93g7gp0u0tq2um57m6rsliq5li.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCahQlY9cmrKGSHHfCMd9pk0iwZOlKY_5g"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "291282445073-h52mmo93g7gp0u0tq2um57m6rsliq5li.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
     }
   ],
   "configuration_version": "1"
