@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "291282445073",
+    "project_id": "proseccheria-43f38",
+    "storage_bucket": "proseccheria-43f38.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:291282445073:android:31f15ac3ef471b4e1ce2b0",
+        "android_client_info": {
+          "package_name": "me.wverdese.proseccheria.android"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "291282445073-h52mmo93g7gp0u0tq2um57m6rsliq5li.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCahQlY9cmrKGSHHfCMd9pk0iwZOlKY_5g"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "291282445073-h52mmo93g7gp0u0tq2um57m6rsliq5li.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
