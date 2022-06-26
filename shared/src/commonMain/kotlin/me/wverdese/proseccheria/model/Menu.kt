@@ -20,10 +20,16 @@ val menu: Menu = listOf(
     Food(id = "FP-05", type = Food.Type.Primo, name = "Tagliatelle al pesto"),
     Food(id = "FP-06", type = Food.Type.Primo, name = "Tagliolini con scampi"),
     Food(id = "FP-07", type = Food.Type.Primo, name = "Risotto ai frutti di mare"),
+    Food(id = "FP-08", type = Food.Type.Primo, name = "Kid's Menu"),
     /* Dolci */
     Food(id = "FD-01", type = Food.Type.Dolce, name = "Tiramisù alla nocciola"),
     Food(id = "FD-02", type = Food.Type.Dolce, name = "Pannacotta"),
     Food(id = "FD-03", type = Food.Type.Dolce, name = "Gelato"),
+    /* Lunch */
+    Food(id = "FL-01", type = Food.Type.Lunch, name = "Focaccia con pollo"),
+    Food(id = "FL-02", type = Food.Type.Lunch, name = "Focaccia al crudo e mozzarella"),
+    Food(id = "FL-03", type = Food.Type.Lunch, name = "Zuppa di pesce"),
+    Food(id = "FL-04", type = Food.Type.Lunch, name = "Insalata di pollo"),
 
     /* Prosecchi e spumanti */
     Wine(id = "WP-01", type = Wine.Type.Prosecco, vessel = Wine.Vessel.BOTH, name = "Valdobbiadene Ex Dry"),

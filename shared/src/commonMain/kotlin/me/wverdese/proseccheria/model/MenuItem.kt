@@ -22,6 +22,7 @@ data class Food(
         object Primo: Type("Pasta e risotti")
         object Secondo: Type("Secondi")
         object Dolce: Type("Dolci")
+        object Lunch: Type("Lunch")
     }
 }
 
@@ -63,6 +64,7 @@ private val typeSorting = listOf(
     Food.Type.Antipasto,
     Food.Type.Primo,
     Food.Type.Secondo,
+    Food.Type.Lunch,
     Wine.Type.Prosecco,
     Wine.Type.Spumante,
     Wine.Type.Rosso,
