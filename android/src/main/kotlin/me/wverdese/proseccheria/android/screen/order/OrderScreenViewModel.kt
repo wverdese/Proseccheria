@@ -5,8 +5,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
 import me.wverdese.proseccheria.domain.TableData
 import me.wverdese.proseccheria.domain.firstTableItems
@@ -28,40 +30,44 @@ class OrderScreenViewModel(
 
     init {
         viewModelScope.launch {
-            tableDataRepo
-                .observeTableData
-                .combine(mode) { data, mode -> data to mode }
-                .combine(searchText) { (data, mode), text -> Triple(data, mode, text) }
-                .collect { (data, mode, searchText) ->
-                    val items: List<TableData.Item> = when {
-                        searchText == null -> data.items
-                        searchText.length > 1 -> data.items.filter {
-                            it.item.name.contains(other = searchText, ignoreCase = true)
-                        }
-                        else -> emptyList()
+            combine(
+                tableDataRepo.observeTableData,
+                mode,
+                searchText
+            ) { data, mode, searchText ->
+                val items: List<TableData.Item> = when {
+                    searchText == null -> data.items
+                    searchText.length > 1 -> data.items.filter {
+                        it.item.name.contains(other = searchText, ignoreCase = true)
                     }
-                    state = state.copy(
-                        searchText = searchText,
-                        tables = data.tables,
-                        table = data.table,
-                        isClearTableButtonEnabled = data.hasOrders,
-                        mode = if (mode == Mode.EDIT)
-                            OrderScreenState.Mode.Edit(
-                                groupedItems = items.groupBy { it.item.type.name }
-                            )
-                        else
-                            OrderScreenState.Mode.View(
-                                orders = items
-                                    .filter { it.hasOrder }
-                                    .map { item ->
-                                        var text = "${item.quantity}x ${item.item.name}"
-                                        if (item is TableData.Item.WineItem) {
-                                            text += " (${item.vessel.asVesselString()})"
-                                        }
-                                        Order(id = item.item.id, text, item.notes)
+                    else -> emptyList()
+                }
+                state.copy(
+                    searchText = searchText,
+                    tables = data.tables,
+                    table = data.table,
+                    isClearTableButtonEnabled = data.hasOrders,
+                    mode = if (mode == Mode.EDIT)
+                        OrderScreenState.Mode.Edit(
+                            groupedItems = items.groupBy { it.item.type.name }
+                        )
+                    else
+                        OrderScreenState.Mode.View(
+                            orders = items
+                                .filter { it.hasOrder }
+                                .map { item ->
+                                    var text = "${item.quantity}x ${item.item.name}"
+                                    if (item is TableData.Item.WineItem) {
+                                        text += " (${item.vessel.asVesselString()})"
                                     }
-                            )
-                    )
+                                    Order(id = item.item.id, text, item.notes)
+                                }
+                        )
+                )
+            }
+                .flowOn(Dispatchers.IO)
+                .collect {
+                    state = it
                 }
         }
     }
