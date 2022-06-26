@@ -74,6 +74,8 @@ dependencies {
     /* Koin */
     implementation("io.insert-koin:koin-core:${Version.KOIN}")
     implementation("io.insert-koin:koin-androidx-compose:${Version.KOIN}")
+    /* KotlinX */
+    implementation("org.jetbrains.kotlinx:kotlinx-datetime:${Version.KotlinX.DATETIME}")
 }
 
 object Version {
@@ -94,5 +96,9 @@ object Version {
         const val COMMON_KTX = "20.0.0"
         const val CRASHLYTICS_KTX = "18.2.11"
         const val ANALYTICS_KTX = "21.0.0"
+    }
+
+    object KotlinX {
+        const val DATETIME = "0.4.0"
     }
 }
