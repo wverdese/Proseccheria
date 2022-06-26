@@ -1,8 +1,11 @@
-@file:OptIn(ExperimentalMaterialApi::class)
+@file:OptIn(ExperimentalMaterialApi::class, ExperimentalFoundationApi::class, ExperimentalComposeUiApi::class)
 
 package me.wverdese.proseccheria.android.screen.order
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -16,6 +19,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.BackdropScaffold
 import androidx.compose.material.BackdropScaffoldState
 import androidx.compose.material.BackdropValue
@@ -23,27 +28,45 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.IconToggleButton
+import androidx.compose.material.LocalContentAlpha
+import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
+import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.rememberBackdropScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import me.wverdese.proseccheria.android.R
 import me.wverdese.proseccheria.android.screen.AlphaIcon
@@ -75,25 +98,32 @@ fun OrderScreen(viewModel: OrderScreenViewModel = getViewModel()) {
         onIncrementQuantity = viewModel::incrementQuantity,
         onDecrementQuantity = viewModel::decrementQuantity,
         onChangeVessel = viewModel::changeVessel,
+        onNavigateToSearchMode = viewModel::onNavigateToSearchMode,
+        onNavigateBackFromSearchMode = viewModel::onNavigateBackFromSearchMode,
+        onSearchTextChanged = viewModel::onSearchTextChanged,
+        onClearSearch = viewModel::onClearSearch,
     )
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun OrderScreen(
     state: OrderScreenState,
-    onToggleMode: () -> Unit,
-    onSelectTable: (table: Table) -> Unit,
-    onClearTable: (table: Table) -> Unit,
-    onEditNotes: (item: TableData.Item, NotesType?) -> Unit,
-    onIncrementQuantity: (item: TableData.Item) -> Unit,
-    onDecrementQuantity: (item: TableData.Item) -> Unit,
-    onChangeVessel: (item: TableData.Item.WineItem) -> Unit,
+    onToggleMode: () -> Unit = {},
+    onSelectTable: (table: Table) -> Unit = {},
+    onClearTable: (table: Table) -> Unit = {},
+    onEditNotes: (item: TableData.Item, NotesType?) -> Unit = { _, _ -> },
+    onIncrementQuantity: (item: TableData.Item) -> Unit = {},
+    onDecrementQuantity: (item: TableData.Item) -> Unit = {},
+    onChangeVessel: (item: TableData.Item.WineItem) -> Unit = {},
+    onNavigateToSearchMode: () -> Unit = {},
+    onNavigateBackFromSearchMode: () -> Unit = {},
+    onSearchTextChanged: (String) -> Unit = {},
+    onClearSearch: () -> Unit = {},
 ) {
-    val coroutineScope = rememberCoroutineScope()
-    val scaffoldState = rememberBackdropScaffoldState(initialValue = BackdropValue.Concealed)
-    val clickedItemState = remember { mutableStateOf<TableData.Item?>(null) }
-    val deleteTableState = remember { mutableStateOf<Table?>(null) }
+    val coroutineScope: CoroutineScope = rememberCoroutineScope()
+    val scaffoldState: BackdropScaffoldState = rememberBackdropScaffoldState(initialValue = BackdropValue.Concealed)
+    val clickedItemState: MutableState<TableData.Item?> = remember { mutableStateOf(null) }
+    val deleteTableState: MutableState<Table?> = remember { mutableStateOf(null) }
 
     clickedItemState.value?.also {
         NotesDialog(
@@ -115,52 +145,26 @@ fun OrderScreen(
         BackdropScaffold(
             scaffoldState = scaffoldState,
             appBar = {
-                TopAppBar(
-                    elevation = 0.dp,
-                    backgroundColor = MaterialTheme.colors.surface,
-                    navigationIcon = {
-                        IconButton(
-                            onClick = {
-                                coroutineScope.launch {
-                                    scaffoldState.toggle()
-                                }
-                            }
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Menu,
-                                contentDescription = "Go back",
-                            )
-                        }
-                    },
-                    title = {
-                        Text(text = table.name)
-                    },
-                    actions = {
-                        val isChecked = mode is OrderScreenState.Mode.View
-                        IconToggleButton(
-                            checked = isChecked,
-                            onCheckedChange = { onToggleMode() }
-                        ) {
-                            val tint by animateColorAsState(
-                                if (isChecked) MaterialTheme.colors.primary
-                                else MaterialTheme.colors.onSurface
-                            )
-                            Icon(
-                                painter = painterResource(R.drawable.ic_wysiwyg),
-                                contentDescription = "View Order",
-                                tint = tint
-                            )
-                        }
-                        IconButton(onClick = { deleteTableState.value = table }, enabled = isClearTableButtonEnabled) {
-                            AlphaIcon(enabled = isClearTableButtonEnabled) {
-                                Icon(
-                                    Icons.Filled.Delete,
-                                    contentDescription = "Clear Table"
-                                )
-                            }
-                        }
-                    },
-                )
+                if (searchText == null) {
+                    OrderBar(
+                        table = table,
+                        isViewOrderButtonToggled = mode is OrderScreenState.Mode.View,
+                        isClearTableButtonEnabled = isClearTableButtonEnabled,
+                        coroutineScope = coroutineScope,
+                        scaffoldState = scaffoldState,
+                        deleteTableState = deleteTableState,
+                        onToggleMode = onToggleMode,
+                        onNavigateToSearchMode = onNavigateToSearchMode
+                    )
+                } else {
+                    SearchBar(
+                        searchText = searchText,
+                        placeholderText = "Search Item",
+                        onSearchTextChanged = onSearchTextChanged,
+                        onClearSearch = onClearSearch,
+                        onNavigateBackFromSearchMode = onNavigateBackFromSearchMode
+                    )
+                }
             },
             backLayerBackgroundColor = MaterialTheme.colors.surface,
             backLayerContent = {
@@ -401,6 +405,155 @@ fun ConfirmDialog(
     }
 }
 
+@Composable
+fun OrderBar(
+    table: Table,
+    isViewOrderButtonToggled: Boolean,
+    isClearTableButtonEnabled: Boolean,
+    coroutineScope: CoroutineScope,
+    scaffoldState: BackdropScaffoldState,
+    deleteTableState: MutableState<Table?>,
+    onToggleMode: () -> Unit,
+    onNavigateToSearchMode: () -> Unit,
+) {
+    TopAppBar(
+        elevation = 0.dp,
+        backgroundColor = MaterialTheme.colors.surface,
+        navigationIcon = {
+            IconButton(
+                onClick = {
+                    coroutineScope.launch {
+                        scaffoldState.toggle()
+                    }
+                }
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Menu,
+                    contentDescription = "Go back",
+                )
+            }
+        },
+        title = {
+            Text(text = table.name)
+        },
+        actions = {
+            IconButton(onClick = { onNavigateToSearchMode() }) {
+                Icon(
+                    Icons.Filled.Search,
+                    contentDescription = "Search",
+                    tint = MaterialTheme.colors.onSurface
+                )
+            }
+            IconToggleButton(
+                checked = isViewOrderButtonToggled,
+                onCheckedChange = { onToggleMode() }
+            ) {
+                val tint by animateColorAsState(
+                    if (isViewOrderButtonToggled) MaterialTheme.colors.primary
+                    else MaterialTheme.colors.onSurface
+                )
+                Icon(
+                    painter = painterResource(R.drawable.ic_wysiwyg),
+                    contentDescription = "View Order",
+                    tint = tint
+                )
+            }
+            IconButton(onClick = { deleteTableState.value = table }, enabled = isClearTableButtonEnabled) {
+                AlphaIcon(enabled = isClearTableButtonEnabled) {
+                    Icon(
+                        Icons.Filled.Delete,
+                        contentDescription = "Clear Table",
+                        tint = MaterialTheme.colors.onSurface
+                    )
+                }
+            }
+        },
+    )
+}
+
+@Composable
+fun SearchBar(
+    searchText: String,
+    placeholderText: String,
+    onSearchTextChanged: (String) -> Unit = {},
+    onClearSearch: () -> Unit = {},
+    onNavigateBackFromSearchMode: () -> Unit = {},
+) {
+    var showClearButton by remember { mutableStateOf(false) }
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val focusRequester = remember { FocusRequester() }
+
+    TopAppBar(
+        elevation = 0.dp,
+        backgroundColor = MaterialTheme.colors.surface,
+        title = {},
+        navigationIcon = {
+            IconButton(onClick = { onNavigateBackFromSearchMode() }) {
+                Icon(
+                    imageVector = Icons.Filled.ArrowBack,
+                    modifier = Modifier,
+                    contentDescription = "Close Search"
+                )
+            }
+        }, actions = {
+
+            OutlinedTextField(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 2.dp)
+                    .onFocusChanged { focusState ->
+                        showClearButton = (focusState.isFocused)
+                    }
+                    .focusRequester(focusRequester),
+                value = searchText,
+                onValueChange = onSearchTextChanged,
+                placeholder = {
+                    Text(text = placeholderText)
+                },
+                colors = TextFieldDefaults.textFieldColors(
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent,
+                    backgroundColor = Color.Transparent,
+                    cursorColor = LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
+                ),
+                trailingIcon = {
+                    AnimatedVisibility(
+                        visible = showClearButton,
+                        enter = fadeIn(),
+                        exit = fadeOut()
+                    ) {
+                        IconButton(onClick = { onClearSearch() }) {
+                            Icon(
+                                imageVector = Icons.Filled.Close,
+                                contentDescription = "Clear Search",
+                                tint = MaterialTheme.colors.onSurface
+                            )
+                        }
+
+                    }
+                },
+                maxLines = 1,
+                singleLine = true,
+                keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
+                keyboardActions = KeyboardActions(onDone = {
+                    keyboardController?.hide()
+                }),
+            )
+        })
+
+    LaunchedEffect(Unit) {
+        focusRequester.requestFocus()
+    }
+}
+
+@Preview
+@Composable
+fun SearchBarPreview() {
+    AppTheme {
+        SearchBar(searchText = "", placeholderText = "Search Item")
+    }
+}
+
 @Preview
 @Composable
 fun VesselWidgetPreview() {
@@ -428,6 +581,7 @@ fun OrderScreenEditPreview() {
     AppTheme {
         OrderScreen(
             state = OrderScreenState(
+                searchText = null,
                 tables = createTables(16).mapIndexed { index, table ->
                     TableData.TableItem(table, index % 2 == 0)
                 },
@@ -493,13 +647,6 @@ fun OrderScreenEditPreview() {
                     )
                 ),
             ),
-            onSelectTable = {},
-            onToggleMode = {},
-            onClearTable = {},
-            onEditNotes = { _, _ -> },
-            onIncrementQuantity = {},
-            onDecrementQuantity = {},
-            onChangeVessel = {},
         )
     }
 }
@@ -510,6 +657,7 @@ fun OrderScreenViewPreview() {
     AppTheme {
         OrderScreen(
             state = OrderScreenState(
+                searchText = null,
                 tables = createTables(16).mapIndexed { index, table ->
                     TableData.TableItem(table, index % 2 == 0)
                 },
@@ -522,13 +670,6 @@ fun OrderScreenViewPreview() {
                     )
                 ),
             ),
-            onSelectTable = {},
-            onToggleMode = {},
-            onClearTable = {},
-            onEditNotes = { _, _ -> },
-            onIncrementQuantity = {},
-            onDecrementQuantity = {},
-            onChangeVessel = {},
         )
     }
 }

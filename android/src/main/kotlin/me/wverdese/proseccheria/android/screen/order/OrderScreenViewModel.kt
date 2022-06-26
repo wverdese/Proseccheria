@@ -24,24 +24,34 @@ class OrderScreenViewModel(
         private set
 
     private val mode = MutableStateFlow(Mode.EDIT)
+    private val searchText = MutableStateFlow<String?>(null)
 
     init {
         viewModelScope.launch {
             tableDataRepo
                 .observeTableData
                 .combine(mode) { data, mode -> data to mode }
-                .collect { (data, mode) ->
+                .combine(searchText) { (data, mode), text -> Triple(data, mode, text) }
+                .collect { (data, mode, searchText) ->
+                    val items: List<TableData.Item> = when {
+                        searchText == null -> data.items
+                        searchText.length > 1 -> data.items.filter {
+                            it.item.name.contains(other = searchText, ignoreCase = true)
+                        }
+                        else -> emptyList()
+                    }
                     state = state.copy(
+                        searchText = searchText,
                         tables = data.tables,
                         table = data.table,
                         isClearTableButtonEnabled = data.hasOrders,
                         mode = if (mode == Mode.EDIT)
                             OrderScreenState.Mode.Edit(
-                                groupedItems = data.items.groupBy { it.item.type.name }
+                                groupedItems = items.groupBy { it.item.type.name }
                             )
                         else
                             OrderScreenState.Mode.View(
-                                orders = data.items
+                                orders = items
                                     .filter { it.hasOrder }
                                     .map { item ->
                                         var text = "${item.quantity}x ${item.item.name}"
@@ -94,7 +104,24 @@ class OrderScreenViewModel(
         mode.value = if (mode.value == Mode.EDIT) Mode.VIEW else Mode.EDIT
     }
 
+    fun onNavigateToSearchMode() {
+        searchText.value = ""
+    }
+
+    fun onNavigateBackFromSearchMode() {
+        searchText.value = null
+    }
+
+    fun onSearchTextChanged(text: String) {
+        searchText.value = text
+    }
+
+    fun onClearSearch() {
+        searchText.value = ""
+    }
+
     private fun initScreenState() = OrderScreenState(
+        searchText = null,
         tables = firstTableItems(),
         table = firstTable(),
         isClearTableButtonEnabled = false,
