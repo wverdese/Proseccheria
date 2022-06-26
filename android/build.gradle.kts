@@ -19,8 +19,8 @@ android {
         applicationId = "me.wverdese.proseccheria.android"
         minSdk = 24
         targetSdk = 32
-        versionCode = 4
-        versionName = "2.0.0"
+        versionCode = 5
+        versionName = "2.0.1"
     }
     buildTypes {
         getByName("debug") {
