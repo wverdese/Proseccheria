@@ -5,6 +5,7 @@ import me.wverdese.proseccheria.model.MenuItemId
 import me.wverdese.proseccheria.model.Table
 
 data class OrderScreenState(
+    val searchText: String?,
     val tables: List<TableData.TableItem>,
     val table: Table,
     val isClearTableButtonEnabled: Boolean,
