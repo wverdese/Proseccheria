@@ -1,6 +1,7 @@
 package me.wverdese.proseccheria.android
 
 import android.app.Application
+import me.wverdese.proseccheria.android.screen.hours.HoursScreenViewModel
 import me.wverdese.proseccheria.android.screen.order.OrderScreen
 import me.wverdese.proseccheria.android.screen.order.OrderScreenViewModel
 import me.wverdese.proseccheria.initKoin
@@ -18,4 +19,5 @@ class MainApp : Application() {
 
 private val appModule = module {
     viewModel { OrderScreenViewModel(tableDataRepo = get()) }
+    viewModel { HoursScreenViewModel() }
 }

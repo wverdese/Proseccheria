@@ -64,6 +64,7 @@ dependencies {
     implementation("androidx.activity:activity-compose:${Version.AndroidX.ACTIVITY_COMPOSE}")
     /* Compose */
     implementation("androidx.compose.material:material:${Version.Compose.MATERIAL}")
+    implementation("androidx.navigation:navigation-compose:${Version.Compose.NAVIGATION}")
     implementation("androidx.compose.ui:ui:${Version.Compose.MAIN}")
     implementation("androidx.compose.ui:ui-tooling:${Version.Compose.MAIN}")
     /* Firebase */
@@ -86,6 +87,7 @@ object Version {
     object Compose {
         const val MAIN = "1.1.0"
         const val MATERIAL = "1.2.0-alpha03"
+        const val NAVIGATION = "2.4.2"
     }
 
     object Firebase {
