@@ -7,7 +7,6 @@
 //
 
 import SwiftUI
-import shared
 
 struct TableRow: View {
     var state: State

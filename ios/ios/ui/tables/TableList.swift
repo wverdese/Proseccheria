@@ -7,14 +7,17 @@
 //
 
 import SwiftUI
-import shared
 
 struct TableList: View {
     var state: TableList.State
+    var onRowTap: (TableRow.State) -> Void
 
     var body: some View {
         List(state.rows) { row in
             TableRow(state: row)
+                .onTapGesture {
+                    onRowTap(row)
+                }
         }
     }
 }
@@ -24,6 +27,6 @@ struct TableList_Previews: PreviewProvider {
         TableList(state: TableList.State(rows: [
             TableRow.State(id: "1", text: "Table 1", isAccented: false),
             TableRow.State(id: "2", text: "Table 2", isAccented: true)
-        ]))
+        ])) { _ in }
     }
 }

@@ -31,6 +31,10 @@ class TableViewModel: ObservableObject {
         }
     }
 
+    func onRowClicked(state: TableRow.State) {
+        // TODO
+    }
+
     deinit {
         job?.cancel()
     }

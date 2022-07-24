@@ -12,6 +12,8 @@ struct TableView: View {
     @StateObject var viewModel = TableViewModel()
 
     var body: some View {
-        TableList(state: viewModel.state.tables)
+        TableList(state: viewModel.state.tables) { row in
+            viewModel.onRowClicked(state: row)
+        }
     }
 }
