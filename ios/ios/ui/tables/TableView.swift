@@ -13,7 +13,7 @@ struct TableView: View {
 
     var body: some View {
         TableList(state: viewModel.state.tables) { row in
-            viewModel.onRowClicked(state: row)
+            viewModel.onRowTap(state: row)
         }
     }
 }

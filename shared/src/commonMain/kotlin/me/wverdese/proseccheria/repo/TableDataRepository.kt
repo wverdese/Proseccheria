@@ -2,7 +2,10 @@ package me.wverdese.proseccheria.repo
 
 import com.russhwolf.settings.ExperimentalSettingsApi
 import com.russhwolf.settings.coroutines.FlowSettings
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -10,6 +13,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import me.wverdese.proseccheria.Cancellable
 import me.wverdese.proseccheria.collect
 import me.wverdese.proseccheria.converter.asItem
@@ -31,6 +35,8 @@ class TableDataRepository(
     private val tables: List<Table> = me.wverdese.proseccheria.model.tables,
     private val menu: Menu = me.wverdese.proseccheria.model.menu,
 ) : KoinComponent {
+    val scope = CoroutineScope(Dispatchers.Main)
+
     private val itemDataStore: FlowSettings = get()
 
     private val _selectedTable = MutableStateFlow(tables.first())
@@ -68,8 +74,8 @@ class TableDataRepository(
             }
 
     @Suppress("unused") // Called in iOS.
-    fun observeTableDataChanges(onEach: (TableData) -> Unit): Cancellable =
-        observeTableData.collect(onEach = onEach) {
+    fun observeTableDataIos(onEach: (TableData) -> Unit): Cancellable =
+        observeTableData.collect(scope = scope, onEach = onEach) {
             println("An error has occurred.")
             it?.printStackTrace()
         }
@@ -89,6 +95,12 @@ class TableDataRepository(
 
     suspend fun incrementQuantity(tableId: TableId, item: TableData.Item) =
         updateQuantity(tableId, item) { plus(1) }
+
+    @Suppress("unused") // Called in iOS.
+    fun incrementQuantityIos(tableId: TableId, item: TableData.Item) =
+        scope.launch {
+            incrementQuantity(tableId = tableId, item = item)
+        }
 
     suspend fun decrementQuantity(tableId: TableId, item: TableData.Item) =
         updateQuantity(tableId, item) { minus(1) }

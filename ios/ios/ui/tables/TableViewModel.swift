@@ -16,11 +16,14 @@ class TableViewModel: ObservableObject {
 
     private let repo = koin.getTableDataRepository()
 
+    private var tableData: TableData? // TODO delete me
+
     init(state: TableView.State = TableView.State()) {
         self.state = state
 
         job?.cancel()
-        job = repo.observeTableDataChanges { tableData in
+        job = repo.observeTableDataIos { tableData in
+            self.tableData = tableData // TODO delete me
             self.state = TableView.State(
                 tables: TableList.State(
                     rows: tableData.tables.map { tableItem in
@@ -31,8 +34,10 @@ class TableViewModel: ObservableObject {
         }
     }
 
-    func onRowClicked(state: TableRow.State) {
-        // TODO
+    func onRowTap(state: TableRow.State) {
+        repo.selectTable(tableId: state.id)
+        // TODO delete me
+        repo.incrementQuantityIos(tableId: state.id, item: tableData!.items[0])
     }
 
     deinit {

@@ -10,9 +10,11 @@ import kotlinx.coroutines.launch
 /**
  * Needed to use flows from Swift.
  */
-fun <T> Flow<T>.collect(onEach: (T) -> Unit, onCompletion: (cause: Throwable?) -> Unit): Cancellable {
-    val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
-
+fun <T> Flow<T>.collect(
+    scope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main),
+    onEach: (T) -> Unit,
+    onCompletion: (cause: Throwable?) -> Unit
+): Cancellable {
     scope.launch {
         try {
             collect {
