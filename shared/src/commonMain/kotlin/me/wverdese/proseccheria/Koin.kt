@@ -16,6 +16,9 @@ fun initKoin(onStart: KoinApplication.() -> Unit, appModule: Module): KoinApplic
         )
     }
 
+@Suppress("unused") // Called in iOS.
+fun initKoinIos(): KoinApplication = initKoin(onStart = {}, appModule = module {})
+
 private val coreModule = module {
     single { TableDataRepository() }
 }

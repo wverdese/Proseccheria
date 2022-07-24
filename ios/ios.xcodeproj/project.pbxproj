@@ -11,7 +11,14 @@
 		058557D9273AAEEB004C7B11 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 058557D8273AAEEB004C7B11 /* Preview Assets.xcassets */; };
 		2152FB042600AC8F00CF470E /* iOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2152FB032600AC8F00CF470E /* iOSApp.swift */; };
 		4D8E2165696DAE6043D6B3E2 /* Pods_ios.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 58487374B7E4D0E3B41F38BF /* Pods_ios.framework */; };
-		7555FF83242A565900829871 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7555FF82242A565900829871 /* ContentView.swift */; };
+		B3D32197288D8C94005D756C /* TableRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3D32196288D8C94005D756C /* TableRow.swift */; };
+		B3D32199288D8F02005D756C /* TableList.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3D32198288D8F02005D756C /* TableList.swift */; };
+		B3D3219B288D8F8F005D756C /* TableViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3D3219A288D8F8F005D756C /* TableViewModel.swift */; };
+		B3D3219D288D913E005D756C /* TableState.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3D3219C288D913E005D756C /* TableState.swift */; };
+		B3D321A0288D9559005D756C /* UIColor+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3D3219F288D9558005D756C /* UIColor+Extensions.swift */; };
+		B3D321A2288D9A05005D756C /* Color+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3D321A1288D9A05005D756C /* Color+Extensions.swift */; };
+		B3D321A4288D9C3A005D756C /* TableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3D321A3288D9C39005D756C /* TableView.swift */; };
+		B3D321A7288D9DDB005D756C /* Koin.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3D321A6288D9DDB005D756C /* Koin.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -20,8 +27,15 @@
 		2152FB032600AC8F00CF470E /* iOSApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iOSApp.swift; sourceTree = "<group>"; };
 		58487374B7E4D0E3B41F38BF /* Pods_ios.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ios.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		7555FF7B242A565900829871 /* Δ Proseccheria.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Δ Proseccheria.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		7555FF82242A565900829871 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		7555FF8C242A565B00829871 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		B3D32196288D8C94005D756C /* TableRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableRow.swift; sourceTree = "<group>"; };
+		B3D32198288D8F02005D756C /* TableList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableList.swift; sourceTree = "<group>"; };
+		B3D3219A288D8F8F005D756C /* TableViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableViewModel.swift; sourceTree = "<group>"; };
+		B3D3219C288D913E005D756C /* TableState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableState.swift; sourceTree = "<group>"; };
+		B3D3219F288D9558005D756C /* UIColor+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+Extensions.swift"; sourceTree = "<group>"; };
+		B3D321A1288D9A05005D756C /* Color+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Extensions.swift"; sourceTree = "<group>"; };
+		B3D321A3288D9C39005D756C /* TableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableView.swift; sourceTree = "<group>"; };
+		B3D321A6288D9DDB005D756C /* Koin.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Koin.swift; sourceTree = "<group>"; };
 		BF51DED0A5FDCB1780B1401F /* Pods-ios.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ios.release.xcconfig"; path = "Target Support Files/Pods-ios/Pods-ios.release.xcconfig"; sourceTree = "<group>"; };
 		EFB9E0DEF1F2FDE6041E27A1 /* Pods-ios.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ios.debug.xcconfig"; path = "Target Support Files/Pods-ios/Pods-ios.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -76,8 +90,9 @@
 		7555FF7D242A565900829871 /* ios */ = {
 			isa = PBXGroup;
 			children = (
+				B3D321A5288D9DA7005D756C /* app */,
+				B3D32194288D8C70005D756C /* ui */,
 				058557BA273AAA24004C7B11 /* Assets.xcassets */,
-				7555FF82242A565900829871 /* ContentView.swift */,
 				7555FF8C242A565B00829871 /* Info.plist */,
 				2152FB032600AC8F00CF470E /* iOSApp.swift */,
 				058557D7273AAEEB004C7B11 /* Preview Content */,
@@ -91,6 +106,44 @@
 				58487374B7E4D0E3B41F38BF /* Pods_ios.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		B3D32194288D8C70005D756C /* ui */ = {
+			isa = PBXGroup;
+			children = (
+				B3D3219E288D953A005D756C /* extensions */,
+				B3D32195288D8C7B005D756C /* tables */,
+			);
+			path = ui;
+			sourceTree = "<group>";
+		};
+		B3D32195288D8C7B005D756C /* tables */ = {
+			isa = PBXGroup;
+			children = (
+				B3D32196288D8C94005D756C /* TableRow.swift */,
+				B3D32198288D8F02005D756C /* TableList.swift */,
+				B3D3219A288D8F8F005D756C /* TableViewModel.swift */,
+				B3D3219C288D913E005D756C /* TableState.swift */,
+				B3D321A3288D9C39005D756C /* TableView.swift */,
+			);
+			path = tables;
+			sourceTree = "<group>";
+		};
+		B3D3219E288D953A005D756C /* extensions */ = {
+			isa = PBXGroup;
+			children = (
+				B3D3219F288D9558005D756C /* UIColor+Extensions.swift */,
+				B3D321A1288D9A05005D756C /* Color+Extensions.swift */,
+			);
+			path = extensions;
+			sourceTree = "<group>";
+		};
+		B3D321A5288D9DA7005D756C /* app */ = {
+			isa = PBXGroup;
+			children = (
+				B3D321A6288D9DDB005D756C /* Koin.swift */,
+			);
+			path = app;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -189,8 +242,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B3D3219D288D913E005D756C /* TableState.swift in Sources */,
 				2152FB042600AC8F00CF470E /* iOSApp.swift in Sources */,
-				7555FF83242A565900829871 /* ContentView.swift in Sources */,
+				B3D3219B288D8F8F005D756C /* TableViewModel.swift in Sources */,
+				B3D321A2288D9A05005D756C /* Color+Extensions.swift in Sources */,
+				B3D321A4288D9C3A005D756C /* TableView.swift in Sources */,
+				B3D321A7288D9DDB005D756C /* Koin.swift in Sources */,
+				B3D32199288D8F02005D756C /* TableList.swift in Sources */,
+				B3D321A0288D9559005D756C /* UIColor+Extensions.swift in Sources */,
+				B3D32197288D8C94005D756C /* TableRow.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

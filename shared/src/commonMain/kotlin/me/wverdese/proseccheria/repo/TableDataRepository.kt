@@ -2,7 +2,6 @@ package me.wverdese.proseccheria.repo
 
 import com.russhwolf.settings.ExperimentalSettingsApi
 import com.russhwolf.settings.coroutines.FlowSettings
-import kotlin.coroutines.EmptyCoroutineContext.plus
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -11,6 +10,8 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
+import me.wverdese.proseccheria.Cancellable
+import me.wverdese.proseccheria.collect
 import me.wverdese.proseccheria.converter.asItem
 import me.wverdese.proseccheria.converter.asItemData
 import me.wverdese.proseccheria.domain.TableData
@@ -66,6 +67,13 @@ class TableDataRepository(
                     } // finally, wrap up the TableData
             }
 
+    @Suppress("unused") // Called in iOS.
+    fun observeTableDataChanges(onEach: (TableData) -> Unit): Cancellable =
+        observeTableData.collect(onEach = onEach) {
+            println("An error has occurred.")
+            it?.printStackTrace()
+        }
+
     fun selectTable(tableId: TableId) {
         tables.find { it.id == tableId }?.also { table -> _selectedTable.update { table } }
     }
@@ -112,6 +120,7 @@ class TableDataRepository(
                 itemDataStore.remove(it)
             }
     }
+
 
     private suspend fun updateIfNeeded(itemData: ItemData, newItemData: ItemData) {
         if (itemData != newItemData) {
